@@ -1,4 +1,4 @@
-﻿# Instalación y uso
+# Instalación y uso
 
 ## Requisitos
 
@@ -61,6 +61,21 @@ se puede definir con la variable de entorno `MIKY_API_KEY` o `GEMINI_API_KEY`.
 
 La capa gratuita no pide tarjeta. Alcanza para uso personal: cientos de órdenes
 por día, y las órdenes básicas ni siquiera gastan cuota.
+
+### El asistente de primera vez
+
+La primera vez que abrís Miky aparece un asistente de cinco pasos que deja todo
+listo sin tocar archivos:
+
+1. **Bienvenida**: qué es y qué va a pasar.
+2. **Micrófono**: lista de entradas, medidor de nivel en vivo y un sonido de
+   prueba.
+3. **API key**: pegarla y **probar la conexión** contra Gemini.
+4. **REAPER**: instalar el puente y abrir REAPER desde ahí.
+5. **Listo**: ejemplos para decir.
+
+Al terminar guarda micrófono y clave, y no vuelve a aparecer. Si querés verlo de
+nuevo: borrá `onboarded = true` de `%APPDATA%\Miky\config.toml`.
 
 ## Uso diario
 

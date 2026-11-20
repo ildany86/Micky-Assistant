@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "miky"
-version = "0.1.0b1"
+version = "0.1.0b3"
 description = "Miky: asistente de voz local para REAPER (escucha y habla local, razona en la nube)"
 readme = "README.md"
 requires-python = ">=3.11"

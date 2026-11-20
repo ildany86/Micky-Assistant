@@ -7,8 +7,8 @@ REAPER se hace por un puente ReaScript propio.
 
 from __future__ import annotations
 
-__version__ = "0.1.0b1"
-__version_display__ = "0.1.0 beta 1"
+__version__ = "0.1.0b3"
+__version_display__ = "0.1.0 beta 3"
 
 APP_NAME = "Miky"
 APP_TAGLINE = "Asistente de grabación para REAPER"

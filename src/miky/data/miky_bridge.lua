@@ -1,4 +1,4 @@
--- Miky bridge v0.1.0b1
+-- Miky bridge v0.1.0b3
 -- Generado por tools/build_lua.py · no editar a mano.
 -- Puente de control entre la app Miky (Python) y REAPER (ReaScript).
 --
@@ -17,7 +17,7 @@
 
 MIKY = MIKY or {}
 
-MIKY.VERSION = '0.1.0b1'
+MIKY.VERSION = '0.1.0b3'
 MIKY.PROTOCOL = 1
 
 -- ===== json.lua ====================================================

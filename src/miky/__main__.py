@@ -56,6 +56,17 @@ def cmd_run(args: argparse.Namespace) -> int:
         config.voice.speak_replies = False
 
     log_mod.setup(config.app.log_level)
+
+    # Primera vez (o falta la API key): asistente de micrófono, clave y puente.
+    if not args.no_ui and not args.console and not args.say and not config.ui.onboarded:
+        try:
+            from .ui.wizard import show_first_run
+
+            if show_first_run(config):
+                config = Config.load()
+        except Exception as exc:  # noqa: BLE001 - nunca impedir el arranque
+            log_mod.get("miky").warning("el asistente de primera vez falló: %s", exc)
+
     core = MikyApp(config, ui_enabled=not args.no_ui)
     core.bootstrap()
 

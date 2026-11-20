@@ -106,6 +106,8 @@ class UISection:
     logo: str = ""
     show_tooltips: bool = True
     opacity: float = 1.0
+    # El asistente de primera vez ya se completó.
+    onboarded: bool = False
 
 
 @dataclass
