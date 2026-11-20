@@ -1,0 +1,961 @@
+{
+  "version": 1,
+  "language": "es",
+  "commands": [
+    {
+      "id": "track.add",
+      "category": "pistas",
+      "summary": "Crea una pista nueva en el proyecto.",
+      "params": {
+        "name": {
+          "type": "string",
+          "description": "Nombre de la pista nueva, por ejemplo \"Guitarra\" o \"Batería\".",
+          "maxLength": 120
+        },
+        "index": {
+          "type": "integer",
+          "description": "Posición donde insertarla (1 = arriba de todo). Si se omite, va al final.",
+          "minimum": 1,
+          "maximum": 512
+        },
+        "color": {
+          "type": "string",
+          "description": "Color de la pista: rojo, naranja, amarillo, verde, celeste, azul, violeta, rosa, gris o \"#RRGGBB\"."
+        },
+        "arm": {
+          "type": "boolean",
+          "description": "Si es true, la deja armada para grabar."
+        }
+      },
+      "required": ["name"],
+      "danger": false,
+      "speech": "Listo, creé la pista {name}.",
+      "examples": ["creá una pista que se llame Guitarra", "agregá una pista de batería al final"]
+    },
+    {
+      "id": "track.add_many",
+      "category": "pistas",
+      "summary": "Crea varias pistas de una sola vez (mejor que llamar varias veces a track.add).",
+      "params": {
+        "names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Lista de nombres, en el orden en que se crean."
+        },
+        "count": {
+          "type": "integer",
+          "description": "Cantidad de pistas sin nombre a crear. Usar solo si no se dan nombres.",
+          "minimum": 1,
+          "maximum": 64
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Listo, creé {count} pistas.",
+      "examples": ["creá cuatro pistas de batería: bombo, redo, hi-hat y overheads"]
+    },
+    {
+      "id": "track.rename",
+      "category": "pistas",
+      "summary": "Le cambia el nombre a una pista existente.",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista destino: nombre (\"Guitarra\") o número (\"2\"). Vacío = la pista seleccionada."
+        },
+        "name": { "type": "string", "description": "Nombre nuevo.", "maxLength": 120 }
+      },
+      "required": ["track", "name"],
+      "danger": false,
+      "speech": "Renombré la pista a {name}.",
+      "examples": ["renombrá la pista 2 como Voz principal"]
+    },
+    {
+      "id": "track.delete",
+      "category": "pistas",
+      "summary": "Elimina una pista y todo su contenido. Pide confirmación al usuario.",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista a eliminar: nombre o número. Vacío = la pista seleccionada."
+        }
+      },
+      "required": ["track"],
+      "danger": true,
+      "speech": "Eliminé la pista {deleted_name}.",
+      "examples": ["borrá la pista de prueba"]
+    },
+    {
+      "id": "track.duplicate",
+      "category": "pistas",
+      "summary": "Duplica una pista completa (con sus plugins y contenido) justo debajo.",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista a duplicar: nombre o número."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Dupliqué la pista.",
+      "examples": ["duplicá la pista de voz"]
+    },
+    {
+      "id": "track.set_volume",
+      "category": "pistas",
+      "summary": "Pone el volumen de una pista en un valor absoluto en dB.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "db": {
+          "type": "number",
+          "description": "Volumen en dB. 0 = sin cambios, -6 = la mitad, -infinito se aproxima con -150.",
+          "minimum": -150,
+          "maximum": 24
+        }
+      },
+      "required": ["track", "db"],
+      "danger": false,
+      "speech": "Puse {name} en {volume_db} dB.",
+      "examples": ["poné la guitarra en -6 dB"]
+    },
+    {
+      "id": "track.adjust_volume",
+      "category": "pistas",
+      "summary": "Sube o baja el volumen de una pista una cantidad de dB respecto de donde está.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "delta_db": {
+          "type": "number",
+          "description": "Cuántos dB sumar (positivo) o restar (negativo). Ej: 2 para subir 2 dB, -3 para bajar 3 dB.",
+          "minimum": -60,
+          "maximum": 60
+        }
+      },
+      "required": ["track", "delta_db"],
+      "danger": false,
+      "speech": "{name} quedó en {volume_db} dB.",
+      "examples": ["subí la guitarra 2 dB", "bajá la voz 3 dB"]
+    },
+    {
+      "id": "track.set_pan",
+      "category": "pistas",
+      "summary": "Panea una pista a izquierda o derecha.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "pan": {
+          "type": "number",
+          "description": "De -100 (izquierda) a 100 (derecha). 0 = centro.",
+          "minimum": -100,
+          "maximum": 100
+        }
+      },
+      "required": ["track", "pan"],
+      "danger": false,
+      "speech": "Paneé {name} al {pan}.",
+      "examples": ["paneá la guitarra a la izquierda", "poné el bajo al centro"]
+    },
+    {
+      "id": "track.mute",
+      "category": "pistas",
+      "summary": "Silencia o desilencia una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "state": {
+          "type": "boolean",
+          "description": "true = silenciar, false = desilenciar. Si se omite, invierte el estado actual."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Listo, cambié el mute de {name}.",
+      "examples": ["silenciá el bajo", "desilenciá la voz"]
+    },
+    {
+      "id": "track.solo",
+      "category": "pistas",
+      "summary": "Activa o desactiva el solo de una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "state": {
+          "type": "boolean",
+          "description": "true = solo, false = sacar solo. Si se omite, invierte."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Listo, cambié el solo de {name}.",
+      "examples": ["hacé solo en la batería", "sacá todos los solos"]
+    },
+    {
+      "id": "track.arm",
+      "category": "pistas",
+      "summary": "Arma o desarma una pista para grabar.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "state": {
+          "type": "boolean",
+          "description": "true = armar, false = desarmar. Si se omite, invierte."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Listo, cambié el armado de {name}.",
+      "examples": ["armá la guitarra para grabar"]
+    },
+    {
+      "id": "track.select",
+      "category": "pistas",
+      "summary": "Selecciona una o varias pistas en REAPER.",
+      "params": {
+        "track": { "type": "string", "description": "Una pista por nombre o número." },
+        "tracks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Varias pistas por nombre o número."
+        },
+        "add": {
+          "type": "boolean",
+          "description": "Si es true, suma a la selección actual en vez de reemplazarla."
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Seleccioné las pistas.",
+      "examples": ["seleccioná todas las pistas de batería"]
+    },
+    {
+      "id": "track.set_color",
+      "category": "pistas",
+      "summary": "Le pone color a una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "color": {
+          "type": "string",
+          "description": "rojo, naranja, amarillo, verde, celeste, azul, violeta, rosa, gris o \"#RRGGBB\"."
+        }
+      },
+      "required": ["track", "color"],
+      "danger": false,
+      "speech": "Pinté {name}.",
+      "examples": ["pintá la batería de rojo"]
+    },
+    {
+      "id": "track.move",
+      "category": "pistas",
+      "summary": "Mueve una pista a otra posición de la lista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista a mover: nombre o número." },
+        "to_index": {
+          "type": "integer",
+          "description": "Posición final, 1 = arriba de todo.",
+          "minimum": 1,
+          "maximum": 512
+        }
+      },
+      "required": ["track", "to_index"],
+      "danger": false,
+      "speech": "Moví {name} a la posición {index}.",
+      "examples": ["mové la guitarra arriba de la batería"]
+    },
+    {
+      "id": "track.set_monitor",
+      "category": "pistas",
+      "summary": "Configura el monitoreo de entrada de una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "mode": {
+          "type": "string",
+          "enum": ["off", "normal", "tape"],
+          "description": "off = sin monitoreo, normal = siempre, tape = solo cuando no está reproduciendo."
+        }
+      },
+      "required": ["track", "mode"],
+      "danger": false,
+      "speech": "Monitoreo de {name} en {mode}.",
+      "examples": ["desactivá el monitoreo de esta pista"]
+    },
+    {
+      "id": "track.set_input",
+      "category": "pistas",
+      "summary": "Elige la entrada de grabación de una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "input": {
+          "type": "string",
+          "description": "none (sin entrada), mono:1, mono:2, stereo:1, stereo:2, midi, midi:ch1..16 o midi:N (dispositivo)."
+        }
+      },
+      "required": ["track", "input"],
+      "danger": false,
+      "speech": "Entrada de {name} en {input}.",
+      "examples": ["poné la entrada de la guitarra en mono 1"]
+    },
+
+    {
+      "id": "fx.add",
+      "category": "plugins",
+      "summary": "Carga un plugin (instrumento o efecto) en una pista. Acepta el nombre exacto o una descripción por tipo y marca; si la descripción coincide con varios, Miky ofrece las opciones para elegir.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "name": {
+          "type": "string",
+          "description": "Nombre exacto (\"ReaEQ\", \"FabFilter Pro-Q 4\") o descripción: \"un compresor estilo bus de SSL\", \"un equalizador tipo pultec\", \"un ecualizador de FabFilter\"."
+        },
+        "position": {
+          "type": "integer",
+          "description": "Posición en la cadena de la pista (1 = primero). Si se omite, va al final.",
+          "minimum": 1,
+          "maximum": 64
+        }
+      },
+      "required": ["track", "name"],
+      "danger": false,
+      "speech": "Cargué {name} en {track_name}.",
+      "examples": ["cargá ReaEQ en la pista 2", "poné un compresor en la voz"]
+    },
+    {
+      "id": "fx.remove",
+      "category": "plugins",
+      "summary": "Quita un plugin de la cadena de una pista.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "fx": {
+          "type": "string",
+          "description": "Plugin a quitar: nombre (\"ReaEQ\") o posición (\"2\"). Si se omite, el último de la cadena."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Saqué {removed}.",
+      "examples": ["sacá el último plugin de la voz"]
+    },
+    {
+      "id": "fx.bypass",
+      "category": "plugins",
+      "summary": "Activa o desactiva (bypass) un plugin sin quitarlo.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "fx": { "type": "string", "description": "Plugin por nombre o posición." },
+        "enabled": {
+          "type": "boolean",
+          "description": "true = activo, false = en bypass. Si se omite, invierte el estado."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Listo, cambié el bypass de {fx}.",
+      "examples": ["desactivá el reverb de la voz"]
+    },
+    {
+      "id": "fx.set_param",
+      "category": "plugins",
+      "summary": "Cambia un parámetro de un plugin. El parámetro se busca por nombre (por ejemplo \"threshold\" o \"ratio\").",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "fx": { "type": "string", "description": "Plugin por nombre o posición." },
+        "param": {
+          "type": "string",
+          "description": "Nombre (o parte del nombre) del parámetro, por ejemplo \"threshold\", \"ratio\", \"gain\"."
+        },
+        "value": {
+          "type": "number",
+          "description": "Valor en la escala real del parámetro (dB, Hz, etc.). Si normalized es true, va de 0 a 1."
+        },
+        "normalized": {
+          "type": "boolean",
+          "description": "Si es true, value va de 0 a 1 sobre todo el rango del parámetro."
+        }
+      },
+      "required": ["track", "fx", "param", "value"],
+      "danger": false,
+      "speech": "Puse {param} en {value}.",
+      "examples": ["bajá el threshold del compresor a -18 dB", "poné el ratio en 4 a 1"]
+    },
+    {
+      "id": "fx.search",
+      "category": "plugins",
+      "summary": "Busca en los plugins instalados los que coinciden con una descripción (tipo, marca o nombre) y devuelve los nombres reales. Sirve para responder «¿qué compresores tengo?» o para descubrir el nombre exacto antes de cargar.",
+      "params": {
+        "query": {
+          "type": "string",
+          "description": "Descripción o parte del nombre: «compresor», «reverb de placa», «waves», «pultec»."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Cuántos candidatos devolver (por defecto 8).",
+          "default": 8
+        }
+      },
+      "required": ["query"],
+      "danger": false,
+      "speech": "Encontré {count}: {summary}.",
+      "examples": ["¿qué compresores tengo instalados?", "¿tenés algún pultec?"]
+    },
+    {
+      "id": "fx.installed",
+      "category": "plugins",
+      "summary": "Lista todos los plugins que REAPER tiene instalados, con la cantidad y los fabricantes.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Tenés {count} plugins instalados.",
+      "examples": ["¿cuántos plugins tengo?"]
+    },
+    {
+      "id": "fx.params",
+      "category": "plugins",
+      "summary": "Lee los parámetros reales de los plugins cargados en una pista (threshold, ratio, ataque, frecuencia, ganancia, etc.) para poder opinar sobre cómo está ajustado realmente.",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista: nombre o número. Si se omite, la seleccionada."
+        },
+        "fx": {
+          "type": "string",
+          "description": "Solo este plugin (por nombre). Si se omite, todos los de la pista."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Cuántos parámetros por plugin (por defecto 12).",
+          "default": 12
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "",
+      "examples": ["¿cómo está ajustado el compresor de la voz?", "¿qué tiene cargado la batería?"]
+    },
+    {
+      "id": "fx.favorites",
+      "category": "plugins",
+      "summary": "Lista los plugins marcados como favoritos en el explorador de plugins de REAPER (la carpeta Favoritos).",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Tus favoritos: {summary}.",
+      "examples": ["¿cuáles son mis plugins favoritos?", "¿qué tengo en favoritos?"]
+    },
+    {
+      "id": "fx.list",
+      "category": "plugins",
+      "summary": "Lista los plugins cargados en una pista para saber qué hay.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "",
+      "examples": ["¿qué plugins tiene la pista de voz?"]
+    },
+    {
+      "id": "fx.open",
+      "category": "plugins",
+      "summary": "Abre la ventana de un plugin para verlo o tocarlo a mano.",
+      "params": {
+        "track": { "type": "string", "description": "Pista: nombre o número." },
+        "fx": { "type": "string", "description": "Plugin por nombre o posición." }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Abrí {fx}.",
+      "examples": ["abrí la interfaz del compresor"]
+    },
+
+    {
+      "id": "transport.play",
+      "category": "transporte",
+      "summary": "Empieza a reproducir desde el cursor.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Dale.",
+      "examples": ["dale", "reproducí", "play"]
+    },
+    {
+      "id": "transport.stop",
+      "category": "transporte",
+      "summary": "Detiene la reproducción o la grabación.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Paré.",
+      "examples": ["pará", "stop", "detené"]
+    },
+    {
+      "id": "transport.pause",
+      "category": "transporte",
+      "summary": "Pausa la reproducción sin volver al cursor.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Pausado.",
+      "examples": ["pausá"]
+    },
+    {
+      "id": "transport.record",
+      "category": "transporte",
+      "summary": "Arranca a grabar en las pistas armadas.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Grabando.",
+      "examples": ["grabá", "a grabar", "record"]
+    },
+    {
+      "id": "transport.set_position",
+      "category": "transporte",
+      "summary": "Mueve el cursor a un compás o a un tiempo en segundos.",
+      "params": {
+        "bar": {
+          "type": "integer",
+          "description": "Compás destino, contando desde 1.",
+          "minimum": 1
+        },
+        "beat": {
+          "type": "number",
+          "description": "Pulso dentro del compás (1 = primer pulso).",
+          "minimum": 1
+        },
+        "seconds": {
+          "type": "number",
+          "description": "Tiempo destino en segundos, si se prefiere al compás.",
+          "minimum": 0
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Me fui al compás {bar}.",
+      "examples": ["andá al compás 32", "volvé al principio del estribillo"]
+    },
+    {
+      "id": "transport.goto_start",
+      "category": "transporte",
+      "summary": "Lleva el cursor al comienzo del proyecto.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Al principio.",
+      "examples": ["andá al principio"]
+    },
+    {
+      "id": "transport.goto_end",
+      "category": "transporte",
+      "summary": "Lleva el cursor al final del proyecto.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Al final.",
+      "examples": ["andá al final de la sesión"]
+    },
+    {
+      "id": "transport.set_loop",
+      "category": "transporte",
+      "summary": "Define y activa o desactiva el loop.",
+      "params": {
+        "start": { "type": "number", "description": "Inicio del loop en segundos.", "minimum": 0 },
+        "finish": { "type": "number", "description": "Fin del loop en segundos.", "minimum": 0 },
+        "enabled": { "type": "boolean", "description": "true = activar loop, false = desactivar." }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Listo, configuré el loop.",
+      "examples": ["activá el loop de grabación", "hacé loop entre el compás 1 y el 8"]
+    },
+    {
+      "id": "transport.goto_marker",
+      "category": "transporte",
+      "summary": "Lleva el cursor a un marcador o región por su nombre.",
+      "params": {
+        "name": { "type": "string", "description": "Nombre del marcador o región." }
+      },
+      "required": ["name"],
+      "danger": false,
+      "speech": "Fui a {name}.",
+      "examples": ["andá al marcador Estribillo"]
+    },
+
+    {
+      "id": "project.save",
+      "category": "proyecto",
+      "summary": "Guarda el proyecto actual.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Guardado.",
+      "examples": ["guardá", "guardá los cambios"]
+    },
+    {
+      "id": "project.save_as",
+      "category": "proyecto",
+      "summary": "Guarda el proyecto con un nombre o en una carpeta nueva. Usar solo si el usuario dictó la ruta exacta.",
+      "params": {
+        "path": {
+          "type": "string",
+          "description": "Ruta completa del archivo .rpp, por ejemplo \"D:\\\\Sesiones\\\\Tema 3.rpp\"."
+        }
+      },
+      "required": ["path"],
+      "danger": true,
+      "speech": "Guardé el proyecto en {path}.",
+      "examples": ["guardá el proyecto como \"Tema 3\" en la carpeta Sesiones"]
+    },
+    {
+      "id": "project.undo",
+      "category": "proyecto",
+      "summary": "Deshace la última acción.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Deshecho.",
+      "examples": ["deshacé", "undo"]
+    },
+    {
+      "id": "project.redo",
+      "category": "proyecto",
+      "summary": "Rehace la última acción deshecha.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Rehecho.",
+      "examples": ["rehacé"]
+    },
+    {
+      "id": "project.set_tempo",
+      "category": "proyecto",
+      "summary": "Cambia el tempo (BPM) del proyecto.",
+      "params": {
+        "bpm": {
+          "type": "number",
+          "description": "Tempo en pulsos por minuto.",
+          "minimum": 5,
+          "maximum": 960
+        }
+      },
+      "required": ["bpm"],
+      "danger": false,
+      "speech": "Tempo en {bpm}.",
+      "examples": ["poné el tempo en 120", "cambiá a 96 BPM"]
+    },
+    {
+      "id": "project.set_metronome",
+      "category": "proyecto",
+      "summary": "Activa o desactiva el metrónomo.",
+      "params": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true = activar, false = desactivar. Si se omite, invierte."
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Listo, cambié el metrónomo.",
+      "examples": ["prendé el metrónomo", "apagá el click"]
+    },
+
+    {
+      "id": "marker.add",
+      "category": "contenido",
+      "summary": "Crea un marcador en el cursor o en una posición dada.",
+      "params": {
+        "name": { "type": "string", "description": "Nombre del marcador." },
+        "position": {
+          "type": "number",
+          "description": "Posición en segundos. Si se omite, usa el cursor.",
+          "minimum": 0
+        }
+      },
+      "required": ["name"],
+      "danger": false,
+      "speech": "Marqué {name}.",
+      "examples": ["marcá el comienzo del estribillo"]
+    },
+    {
+      "id": "region.add",
+      "category": "contenido",
+      "summary": "Crea una región entre dos tiempos.",
+      "params": {
+        "name": { "type": "string", "description": "Nombre de la región." },
+        "start": { "type": "number", "description": "Inicio en segundos.", "minimum": 0 },
+        "finish": { "type": "number", "description": "Fin en segundos.", "minimum": 0 }
+      },
+      "required": ["name"],
+      "danger": false,
+      "speech": "Creé la región {name}.",
+      "examples": ["creá una región llamada Estribillo"]
+    },
+    {
+      "id": "render.start",
+      "category": "render",
+      "summary": "Renderiza el proyecto (mezcla completa, stems o regiones) con los ajustes actuales de REAPER.",
+      "params": {
+        "mode": {
+          "type": "string",
+          "enum": ["last", "mix", "entire", "time_selection", "regions", "selected_items", "stems", "stems_master"],
+          "description": "mix/entire = mezcla completa; time_selection = solo la selección de tiempo; regions = todas las regiones; stems = todas las pistas por separado; stems_master = stems + mezcla; last = respetar lo último configurado en REAPER."
+        },
+        "out_dir": {
+          "type": "string",
+          "description": "Carpeta de destino. Si se omite, se usa la carpeta configurada en Miky."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Nombre de archivo, admite comodines de REAPER como $project. Si se omite se usa el configurado."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["last", "wav"],
+          "description": "wav usa los ajustes por defecto de WAV de REAPER; last respeta el último formato usado."
+        },
+        "normalize_lufs": {
+          "type": "number",
+          "description": "Normalizar a este nivel de loudness integrado, por ejemplo -14. Si se omite, no normaliza.",
+          "minimum": -40,
+          "maximum": 0
+        },
+        "add_to_project": {
+          "type": "boolean",
+          "description": "Si es true, agrega los archivos renderizados al proyecto."
+        },
+        "overwrite": {
+          "type": "boolean",
+          "description": "Pisa el archivo si ya existe. Sin esto, si el nombre coincide con un archivo previo el render se rechaza para no bloquear REAPER con un diálogo."
+        }
+      },
+      "required": [],
+      "danger": true,
+      "speech": "Listo, terminó el render.",
+      "pre_speech": "Renderizando. Esto puede tardar; no voy a poder atenderte hasta que termine.",
+      "examples": ["renderizá la mezcla", "exportá todas las pistas por separado en WAV", "renderizá a -14 LUFS"]
+    },
+    {
+      "id": "view.mixer",
+      "category": "vista",
+      "summary": "Muestra u oculta el mezclador de REAPER.",
+      "params": {
+        "visible": {
+          "type": "boolean",
+          "description": "true = mostrar, false = ocultar. Si se omite, alterna."
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Mezclador {state_text}.",
+      "examples": ["abrí el mixer", "mostrame el mezclador", "cerrá el mixer"]
+    },
+    {
+      "id": "view.routing",
+      "category": "vista",
+      "summary": "Abre o cierra la ventana de ruteo (la matriz de envíos y conexiones entre pistas). Alterna: si estaba abierta, la cierra.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Listo.",
+      "examples": ["abrí la matriz de ruteo", "mostrame los ruteos", "cerrá la ventana de ruteo"]
+    },
+    {
+      "id": "track.add_like",
+      "category": "pistas",
+      "summary": "Crea una pista nueva copiando la configuración de otra: entrada, monitoreo, armado, nivel, paneo, color y toda la cadena de plugins (sin copiar el audio grabado).",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista modelo: nombre o número (por ejemplo \"Guitarra\")."
+        },
+        "name": {
+          "type": "string",
+          "description": "Nombre de la pista nueva. Si se omite, repite el nombre de la pista modelo.",
+          "maxLength": 120
+        },
+        "copy_fx": {
+          "type": "boolean",
+          "description": "Copiar la cadena de plugins. Por defecto sí."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Listo, creé {name} igual a {source}.",
+      "examples": ["quiero grabar otra pista de guitarra igual a la que ya tengo", "hacé otra pista como la de voz"]
+    },
+    {
+      "id": "track.output",
+      "category": "ruteo",
+      "summary": "Manda el audio de una pista a un par de salidas físicas de la placa (1/2, 3/4, 5/6…), además de la mezcla principal. Sirve para armar una mezcla de monitoreo aparte, por ejemplo para los auriculares.",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista: nombre o número."
+        },
+        "pair": {
+          "type": "integer",
+          "description": "Par de salidas físicas: 1 = salidas 1/2, 2 = salidas 3/4, 3 = salidas 5/6.",
+          "default": 1
+        },
+        "level_db": {
+          "type": "number",
+          "description": "Nivel de esa salida en dB. Si se omite, 0 dB.",
+          "default": 0
+        },
+        "mono": {
+          "type": "boolean",
+          "description": "Mezclar a mono en esa salida.",
+          "default": false
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "{track} ahora sale también por las salidas {channels}.",
+      "examples": ["mandá la batería a las salidas 3 y 4", "ruteá el bajo a la salida 3/4"]
+    },
+    {
+      "id": "track.output_clear",
+      "category": "ruteo",
+      "summary": "Quita todas las salidas físicas de una pista (deshace un ruteo de monitoreo).",
+      "params": {
+        "track": {
+          "type": "string",
+          "description": "Pista: nombre o número."
+        }
+      },
+      "required": ["track"],
+      "danger": false,
+      "speech": "Saqué las salidas físicas de {track}.",
+      "examples": ["sacá el ruteo de monitoreo de la batería", "quitá las salidas físicas del bajo"]
+    },
+    {
+      "id": "send.add",
+      "category": "ruteo",
+      "summary": "Crea un envío de una pista a otra (por ejemplo, para mandar la voz a un reverb).",
+      "params": {
+        "from": {
+          "type": "string",
+          "description": "Pista que envía: nombre o número. Si se omite, la pista seleccionada."
+        },
+        "to": {
+          "type": "string",
+          "description": "Pista que recibe: nombre o número."
+        },
+        "level_db": {
+          "type": "number",
+          "description": "Nivel del envío en dB. Si se omite, queda en 0 dB.",
+          "minimum": -150,
+          "maximum": 12
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["post_fader", "pre_fx", "post_fx"],
+          "description": "Punto de toma de la señal. Por defecto post_fader."
+        }
+      },
+      "required": ["to"],
+      "danger": false,
+      "speech": "Envié {from} a {to}.",
+      "examples": ["mandá la voz al reverb", "creá un envío de la guitarra al bus de efectos"]
+    },
+    {
+      "id": "send.remove",
+      "category": "ruteo",
+      "summary": "Quita un envío entre dos pistas.",
+      "params": {
+        "from": {
+          "type": "string",
+          "description": "Pista que envía: nombre o número. Si se omite, la pista seleccionada."
+        },
+        "to": {
+          "type": "string",
+          "description": "Pista que recibe: nombre o número."
+        }
+      },
+      "required": ["to"],
+      "danger": false,
+      "speech": "Saqué el envío de {from} a {to}.",
+      "examples": ["sacá el envío de la voz al reverb"]
+    },
+    {
+      "id": "send.set_level",
+      "category": "ruteo",
+      "summary": "Cambia el nivel de un envío existente.",
+      "params": {
+        "from": {
+          "type": "string",
+          "description": "Pista que envía: nombre o número. Si se omite, la pista seleccionada."
+        },
+        "to": {
+          "type": "string",
+          "description": "Pista que recibe: nombre o número."
+        },
+        "db": {
+          "type": "number",
+          "description": "Nivel del envío en dB (0 = sin atenuación, -6 = la mitad).",
+          "minimum": -150,
+          "maximum": 24
+        }
+      },
+      "required": ["to", "db"],
+      "danger": false,
+      "speech": "Envío de {from} a {to} en {level_db} dB.",
+      "examples": ["subí el envío de la voz al reverb 3 dB"]
+    },
+    {
+      "id": "item.keep_between",
+      "category": "edicion",
+      "summary": "Recorta los items seleccionados para dejar solo lo que cae entre dos marcadores (o dos tiempos). Borra lo de afuera.",
+      "params": {
+        "start_marker": {
+          "type": "string",
+          "description": "Nombre del marcador o región donde empieza lo que se conserva."
+        },
+        "end_marker": {
+          "type": "string",
+          "description": "Nombre del marcador o región donde termina lo que se conserva."
+        },
+        "start": {
+          "type": "number",
+          "description": "Inicio en segundos, si no se usa un marcador.",
+          "minimum": 0
+        },
+        "end": {
+          "type": "number",
+          "description": "Fin en segundos, si no se usa un marcador.",
+          "minimum": 0
+        },
+        "track": {
+          "type": "string",
+          "description": "Si no hay items seleccionados, recorta todos los items de esta pista (nombre o número)."
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Recorté el item: dejé de {start} a {finish}.",
+      "examples": [
+        "dejá del item solo lo que va desde el marcador estrofa hasta el marcador estribillo",
+        "recortá este item entre 1:10 y 1:40"
+      ]
+    },
+    {
+      "id": "item.split_at_cursor",
+      "category": "edicion",
+      "summary": "Corta en dos los items seleccionados en el cursor.",
+      "params": {
+        "position": {
+          "type": "number",
+          "description": "Segundo donde cortar. Si se omite, usa el cursor.",
+          "minimum": 0
+        }
+      },
+      "required": [],
+      "danger": false,
+      "speech": "Corté {splits} item.",
+      "examples": ["cortá este audio acá"]
+    },
+    {
+      "id": "item.delete_selected",
+      "category": "edicion",
+      "summary": "Borra los items seleccionados del proyecto.",
+      "params": {},
+      "required": [],
+      "danger": false,
+      "speech": "Borré {deleted} item.",
+      "examples": ["borrá lo que tengo seleccionado"]
+    }
+  ]
+}

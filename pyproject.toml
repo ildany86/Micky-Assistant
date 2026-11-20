@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "miky"
+version = "0.1.0b1"
+description = "Miky: asistente de voz local para REAPER (escucha y habla local, razona en la nube)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Propietario" }
+authors = [{ name = "Daniel Lugo" }]
+keywords = ["reaper", "asistente", "voz", "reaScript", "gemini"]
+dependencies = [
+  "PySide6>=6.7",
+  "google-genai>=3.0,<4",
+  "numpy>=1.26",
+  "sounddevice>=0.5",
+  "comtypes>=1.4",
+  "edge-tts>=7.0",
+  "miniaudio>=1.60",
+]
+
+[project.optional-dependencies]
+voice = ["faster-whisper>=1.2", "onnxruntime>=1.18"]
+dev = ["pytest>=8", "lupa>=2"]
+
+[project.scripts]
+miky = "miky.__main__:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+miky = ["data/*.json", "data/*.lua", "data/*.md", "data/assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

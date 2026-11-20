@@ -1,0 +1,35 @@
+# Entorno
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.tools/
+.tmp/
+
+# Build / distribucion
+build/
+dist/
+*.egg-info/
+reaper/build/
+
+# Logs y datos locales
+*.log
+logs/
+renders/
+*.wav
+
+# Investigacion: artefactos y material de referencia voluminoso.
+# Las notas y el informe se versionan; las descargas y salidas no.
+research/out/
+research/rp/
+research/*.wav
+research/live_test_report.json
+research/reascripthelp.*
+research/api.json
+research/reaper_plugin*.h
+research/lua_sigs.txt
+
+# Configuracion local (puede contener la API key cifrada)
+config.toml
+.env
+*.secret

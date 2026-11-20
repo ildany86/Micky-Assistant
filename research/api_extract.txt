@@ -1,0 +1,268 @@
+﻿functions: 732
+
+### MISSING: defer
+
+### MISSING: atexit
+
+### EnumerateFiles
+C   : const char* EnumerateFiles(const char* path, int fileindex)
+LUA : string reaper.EnumerateFiles(string path, integer fileindex)
+DESC: List the files in the "path" directory. Returns NULL/nil when all files have been listed. Use fileindex = -1 to force re-read of directory (invalidate cache). See EnumerateSubdirectories
+
+### EnumerateSubdirectories
+C   : const char* EnumerateSubdirectories(const char* path, int subdirindex)
+LUA : string reaper.EnumerateSubdirectories(string path, integer subdirindex)
+DESC: List the subdirectories in the "path" directory. Use subdirindex = -1 to force re-read of directory (invalidate cache). Returns NULL/nil when all subdirectories have been listed. See EnumerateFiles
+
+### InsertTrackAtIndex
+C   : void InsertTrackAtIndex(int idx, bool wantDefaults)
+LUA : reaper.InsertTrackAtIndex(integer idx, boolean wantDefaults)
+DESC: inserts a track at idx,of course this will be clamped to 0..GetNumTracks(). wantDefaults=TRUE for default envelopes/FX,otherwise no enabled fx/env. Superseded, see InsertTrackInProject
+
+### DeleteTrack
+C   : void DeleteTrack(MediaTrack* tr)
+LUA : reaper.DeleteTrack(MediaTrack tr)
+DESC: deletes a track
+
+### GetSetMediaTrackInfo_String
+C   : bool GetSetMediaTrackInfo_String(MediaTrack* tr, const char* parmname, char* stringNeedBig, bool setNewValue)
+LUA : boolean retval, string stringNeedBig = reaper.GetSetMediaTrackInfo_String(MediaTrack tr, string parmname, string stringNeedBig, boolean setNewValue)
+DESC: Get or set track string attributes. P_NAME : char * : track name (on master returns NULL) P_ICON : const char * : track icon (full filename, or relative to resource_path/data/track_icons) P_LANENAME:n : char * : lane name (returns NULL for non-fixed-lane-tracks) P_MCP_LAYOUT : const char * : layout name P_RAZOREDITS : const char * : list of razor edit areas, as space-separated triples of start time, end time, and envelope GUID string. Example: "0.0 1.0 \"\" 0.0 1.0 "{xyz-...}" P_RAZOREDITS_EXT : const char * : list of razor edit areas, as comma-separated sets of space-separated tuples of start
+
+### MISSING: GetSetMediaTrackInfo
+
+### SetMediaTrackInfo_Value
+C   : bool SetMediaTrackInfo_Value(MediaTrack* tr, const char* parmname, double newvalue)
+LUA : boolean reaper.SetMediaTrackInfo_Value(MediaTrack tr, string parmname, number newvalue)
+DESC: Set track numerical-value attributes. B_MUTE : bool * : muted B_PHASE : bool * : track phase inverted B_RECMON_IN_EFFECT : bool * : record monitoring in effect (current audio-thread playback state, read-only) IP_TRACKNUMBER : int : track number 1-based, 0=not found, -1=master track (read-only, returns the int directly) I_SOLO : int * : soloed, 0=not soloed, 1=soloed, 2=soloed in place, 5=safe soloed, 6=safe soloed in place B_SOLO_DEFEAT : bool * : when set, if anything else is soloed and this track is not muted, this track acts soloed I_FXEN : int * : fx enabled, 0=bypassed, !0=fx active I_REC
+
+### GetMediaTrackInfo_Value
+C   : double GetMediaTrackInfo_Value(MediaTrack* tr, const char* parmname)
+LUA : number reaper.GetMediaTrackInfo_Value(MediaTrack tr, string parmname)
+DESC: Get track numerical-value attributes. B_MUTE : bool * : muted B_PHASE : bool * : track phase inverted B_RECMON_IN_EFFECT : bool * : record monitoring in effect (current audio-thread playback state, read-only) IP_TRACKNUMBER : int : track number 1-based, 0=not found, -1=master track (read-only, returns the int directly) I_SOLO : int * : soloed, 0=not soloed, 1=soloed, 2=soloed in place, 5=safe soloed, 6=safe soloed in place B_SOLO_DEFEAT : bool * : when set, if anything else is soloed and this track is not muted, this track acts soloed I_FXEN : int * : fx enabled, 0=bypassed, !0=fx active I_REC
+
+### SetTrackColor
+C   : void SetTrackColor(MediaTrack* track, int color)
+LUA : reaper.SetTrackColor(MediaTrack track, integer color)
+DESC: Set the custom track color, color is OS dependent (i.e. ColorToNative(r,g,b). To unset the track color, see SetMediaTrackInfo_Value I_CUSTOMCOLOR
+
+### GetTrackColor
+C   : int GetTrackColor(MediaTrack* track)
+LUA : integer reaper.GetTrackColor(MediaTrack track)
+DESC: Returns the track custom color as OS dependent color|0x1000000 (i.e. ColorToNative(r,g,b)|0x1000000). Black is returned as 0x1000000, no color setting is returned as 0.
+
+### CreateTrackSend
+C   : int CreateTrackSend(MediaTrack* tr, MediaTrack* desttrInOptional)
+LUA : integer reaper.CreateTrackSend(MediaTrack tr, MediaTrack desttrIn)
+DESC: Create a send/receive (desttrInOptional!=NULL), or a hardware output (desttrInOptional==NULL) with default properties, return >=0 on success (== new send/receive index). See RemoveTrackSend, GetSetTrackSendInfo, GetTrackSendInfo_Value, SetTrackSendInfo_Value.
+
+### SetTrackSendInfo_Value
+C   : bool SetTrackSendInfo_Value(MediaTrack* tr, int category, int sendidx, const char* parmname, double newvalue)
+LUA : boolean reaper.SetTrackSendInfo_Value(MediaTrack tr, integer category, integer sendidx, string parmname, number newvalue)
+DESC: Set send/receive/hardware output numerical-value attributes, return true on success. category is <0 for receives, 0=sends, >0 for hardware outputs parameter names: B_MUTE : bool * B_PHASE : bool * : true to flip phase B_MONO : bool * D_VOL : double * : 1.0 = +0dB etc D_PAN : double * : -1..+1 D_PANLAW : double * : 1.0=+0.0db, 0.5=-6dB, -1.0 = projdef etc I_SENDMODE : int * : 0=post-fader, 1=pre-fx, 2=post-fx (deprecated), 3=post-fx, 8=pre-receive (not supported for hardware outputs) I_AUTOMODE : int * : automation mode (-1=use track automode, 0=trim/off, 1=read, 2=touch, 3=write, 4=latch) I_SR
+
+### MISSING: GetSetTrackSendInfo
+
+### TrackFX_AddByName
+C   : int TrackFX_AddByName(MediaTrack* track, const char* fxname, bool recFX, int instantiate)
+LUA : integer reaper.TrackFX_AddByName(MediaTrack track, string fxname, boolean recFX, integer instantiate)
+DESC: Adds or queries the position of a named FX from the track FX chain (recFX=false) or record input FX/monitoring FX (recFX=true, monitoring FX are on master track). Specify a negative value for instantiate to always create a new effect, 0 to only query the first instance of an effect, or a positive value to add an instance if one is not found. If instantiate is <= -1000, it is used for the insertion position (-1000 is first item in chain, -1001 is second, etc). fxname can have prefix to specify type: VST3:,VST2:,VST:,AU:,JS:, or DX:, or FXADD: which adds selected items from the currently-open FX
+
+### TrackFX_SetParam
+C   : bool TrackFX_SetParam(MediaTrack* track, int fx, int param, double val)
+LUA : boolean reaper.TrackFX_SetParam(MediaTrack track, integer fx, integer param, number val)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### TrackFX_SetParamNormalized
+C   : bool TrackFX_SetParamNormalized(MediaTrack* track, int fx, int param, double value)
+LUA : boolean reaper.TrackFX_SetParamNormalized(MediaTrack track, integer fx, integer param, number value)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### TrackFX_GetParamNormalized
+C   : double TrackFX_GetParamNormalized(MediaTrack* track, int fx, int param)
+LUA : number reaper.TrackFX_GetParamNormalized(MediaTrack track, integer fx, integer param)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### TrackFX_GetCount
+C   : int TrackFX_GetCount(MediaTrack* track)
+LUA : integer reaper.TrackFX_GetCount(MediaTrack track)
+DESC: 
+
+### TrackFX_GetFXName
+C   : bool TrackFX_GetFXName(MediaTrack* track, int fx, char* bufOut, int bufOut_sz)
+LUA : boolean retval, string buf = reaper.TrackFX_GetFXName(MediaTrack track, integer fx)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### TrackFX_SetEnabled
+C   : void TrackFX_SetEnabled(MediaTrack* track, int fx, bool enabled)
+LUA : reaper.TrackFX_SetEnabled(MediaTrack track, integer fx, boolean enabled)
+DESC: See TrackFX_GetEnabled
+
+### TrackFX_GetEnabled
+C   : bool TrackFX_GetEnabled(MediaTrack* track, int fx)
+LUA : boolean reaper.TrackFX_GetEnabled(MediaTrack track, integer fx)
+DESC: See TrackFX_SetEnabled
+
+### TrackFX_CopyToTrack
+C   : void TrackFX_CopyToTrack(MediaTrack* src_track, int src_fx, MediaTrack* dest_track, int dest_fx, bool is_move)
+LUA : reaper.TrackFX_CopyToTrack(MediaTrack src_track, integer src_fx, MediaTrack dest_track, integer dest_fx, boolean is_move)
+DESC: Copies (or moves) FX from src_track to dest_track. Can be used with src_track=dest_track to reorder, FX indices have 0x1000000 set to reference input FX. dest_fx can also have 0x800000 set to specify an unused FX slot.
+
+### TrackFX_Delete
+C   : bool TrackFX_Delete(MediaTrack* track, int fx)
+LUA : boolean reaper.TrackFX_Delete(MediaTrack track, integer fx)
+DESC: Remove a FX from track chain (returns true on success)
+
+### TrackFX_GetParam
+C   : double TrackFX_GetParam(MediaTrack* track, int fx, int param, double* minvalOut, double* maxvalOut)
+LUA : number retval, number minval, number maxval = reaper.TrackFX_GetParam(MediaTrack track, integer fx, integer param)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### TrackFX_GetFormattedParamValue
+C   : bool TrackFX_GetFormattedParamValue(MediaTrack* track, int fx, int param, char* bufOut, int bufOut_sz)
+LUA : boolean retval, string buf = reaper.TrackFX_GetFormattedParamValue(MediaTrack track, integer fx, integer param)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track).
+
+### GetPlayState
+C   : int GetPlayState()
+LUA : integer reaper.GetPlayState()
+DESC: &1=playing, &2=paused, &4=is recording
+
+### GetPlayPosition
+C   : double GetPlayPosition()
+LUA : number reaper.GetPlayPosition()
+DESC: returns latency-compensated actual-what-you-hear position
+
+### GetCursorPosition
+C   : double GetCursorPosition()
+LUA : number reaper.GetCursorPosition()
+DESC: edit cursor position
+
+### GetSet_LoopTimeRange
+C   : void GetSet_LoopTimeRange(bool isSet, bool isLoop, double* startOut, double* endOut, bool allowautoseek)
+LUA : number start, number end = reaper.GetSet_LoopTimeRange(boolean isSet, boolean isLoop, number start, number end, boolean allowautoseek)
+DESC: 
+
+### Master_GetTempo
+C   : double Master_GetTempo()
+LUA : number reaper.Master_GetTempo()
+DESC: 
+
+### SetCurrentBPM
+C   : void SetCurrentBPM(ReaProject* __proj, double bpm, bool wantUndo)
+LUA : reaper.SetCurrentBPM(ReaProject __proj, number bpm, boolean wantUndo)
+DESC: set current BPM in project, set wantUndo=true to add undo point
+
+### GetSetProjectInfo
+C   : double GetSetProjectInfo(ReaProject* project, const char* desc, double value, bool is_set)
+LUA : number reaper.GetSetProjectInfo(ReaProject project, string desc, number value, boolean is_set)
+DESC: Get or set project information. RENDER_SETTINGS : (&(1|2)==0)=master mix, &1=stems+master mix, &2=stems only, &4=multichannel tracks to multichannel files, &8=use render matrix, &16=tracks with only mono media to mono files, &32=selected media items, &64=selected media items via master, &128=selected tracks via master, &256=embed transients if format supports, &512=embed metadata if format supports, &1024=embed take markers if format supports, &2048=2nd pass render, &4096=render razor edits, &8192=pre-fader stems (not if via master), &16384=only stem channels sent to parent, &32768=preserve so
+
+### GetSetProjectInfo_String
+C   : bool GetSetProjectInfo_String(ReaProject* project, const char* desc, char* valuestrNeedBig, bool is_set)
+LUA : boolean retval, string valuestrNeedBig = reaper.GetSetProjectInfo_String(ReaProject project, string desc, string valuestrNeedBig, boolean is_set)
+DESC: Get or set project information. PROJECT_NAME : project file name (read-only, is_set will be ignored) PROJECT_TITLE : title field from Project Settings/Notes dialog PROJECT_AUTHOR : author field from Project Settings/Notes dialog TRACK_GROUP_NAME:X : track group name, X should be 1..64 RULER_LANE_NAME:X : ruler lane name RULER_LANE_GUID:X : ruler lane unique identifier MARKER_GUID:X : discouraged. see GetRegionOrMarker, GetSetRegionOrMarkerInfo_String MARKER_INDEX_FROM_GUID:{GUID} : discouraged. see GetRegionOrMarker, GetSetRegionOrMarkerInfo_String OPENCOPY_CFGIDX : integer for the configurati
+
+### AddProjectMarker2
+C   : int AddProjectMarker2(ReaProject* proj, bool isrgn, double pos, double rgnend, const char* name, int wantidx, int color)
+LUA : integer reaper.AddProjectMarker2(ReaProject proj, boolean isrgn, number pos, number rgnend, string name, integer wantidx, integer color)
+DESC: Returns the index of the created marker/region, or -1 on failure. Supply wantidx>=0 if you want a particular index number, but you'll get a different index number if wantidx is already in use. color should be 0 (default color), or ColorToNative(r,g,b)|0x1000000. discouraged. see AddRegionOrMarker, GetNumRegionsOrMarkers, GetRegionOrMarker, SetRegionOrMarkerInfo_Value, GetSetRegionOrMarkerInfo_String. Note: this function can't clear a marker's name (an empty string will leave the name unchanged), see SetProjectMarker4.
+
+### DeleteProjectMarker
+C   : bool DeleteProjectMarker(ReaProject* proj, int markrgnindexnumber, bool isrgn)
+LUA : boolean reaper.DeleteProjectMarker(ReaProject proj, integer markrgnindexnumber, boolean isrgn)
+DESC: Delete a marker. proj==NULL for the active project.
+
+### Undo_BeginBlock
+C   : void Undo_BeginBlock()
+LUA : reaper.Undo_BeginBlock()
+DESC: call to start a new block
+
+### Undo_EndBlock
+C   : void Undo_EndBlock(const char* descchange, int extraflags)
+LUA : reaper.Undo_EndBlock(string descchange, integer extraflags)
+DESC: call to end the block,with extra flags if any,and a description
+
+### Undo_OnStateChange
+C   : void Undo_OnStateChange(const char* descchange)
+LUA : reaper.Undo_OnStateChange(string descchange)
+DESC: limited state change to items
+
+### Undo_EndBlock2
+C   : void Undo_EndBlock2(ReaProject* proj, const char* descchange, int extraflags)
+LUA : reaper.Undo_EndBlock2(ReaProject proj, string descchange, integer extraflags)
+DESC: call to end the block,with extra flags if any,and a description
+
+### PreventUIRefresh
+C   : void PreventUIRefresh(int prevent_count)
+LUA : reaper.PreventUIRefresh(integer prevent_count)
+DESC: adds prevent_count to the UI refresh prevention state; always add then remove the same amount, or major disfunction will occur
+
+### GetResourcePath
+C   : const char* GetResourcePath()
+LUA : string reaper.GetResourcePath()
+DESC: returns path where ini files are stored, other things are in subdirectories.
+
+### GetProjectPath
+C   : void GetProjectPath(char* bufOut, int bufOut_sz)
+LUA : string buf = reaper.GetProjectPath()
+DESC: Get the project recording path.
+
+### GetNumTracks
+C   : int GetNumTracks()
+LUA : integer reaper.GetNumTracks()
+DESC: Returns number of tracks in current project, see CountTracks()
+
+### CountTracks
+C   : int CountTracks(ReaProject* projOptional)
+LUA : integer reaper.CountTracks(ReaProject proj)
+DESC: count the number of tracks in the project (proj=0 for active project)
+
+### GetTrack
+C   : MediaTrack* GetTrack(ReaProject* proj, int trackidx)
+LUA : MediaTrack reaper.GetTrack(ReaProject proj, integer trackidx)
+DESC: get a track from a project by track count (zero-based) (proj=0 for active project)
+
+### Main_OnCommand
+C   : void Main_OnCommand(int command, int flag)
+LUA : reaper.Main_OnCommand(integer command, integer flag)
+DESC: See Main_OnCommandEx.
+
+### MISSING: kbd_EnumerateActions
+
+### kbd_getTextFromCmd
+C   : const char* kbd_getTextFromCmd(int cmd, KbdSectionInfo* section)
+LUA : string reaper.kbd_getTextFromCmd(integer cmd, KbdSectionInfo section)
+DESC: 
+
+### SetExtState
+C   : void SetExtState(const char* section, const char* key, const char* value, bool persist)
+LUA : reaper.SetExtState(string section, string key, string value, boolean persist)
+DESC: Set the extended state value for a specific section and key. persist=true means the value should be stored and reloaded the next time REAPER is opened. Note that with persist=true set, the value will be encoded as a text line in an .ini file and may behaved in unexpected ways if it contains any newlines: do not pass a string with newlines to this function. To save arbitrary data persistently, use base64 encoding or similar. See GetExtState, DeleteExtState, HasExtState.
+
+### GetExtState
+C   : const char* GetExtState(const char* section, const char* key)
+LUA : string reaper.GetExtState(string section, string key)
+DESC: Get the extended state value for a specific section and key. See SetExtState, DeleteExtState, HasExtState.
+
+### GetSetRepeat
+C   : int GetSetRepeat(int val)
+LUA : integer reaper.GetSetRepeat(integer val)
+DESC: -1 == query,0=clear,1=set,>1=toggle . returns new value
+
+### SetEditCurPos
+C   : void SetEditCurPos(double time, bool moveview, bool seekplay)
+LUA : reaper.SetEditCurPos(number time, boolean moveview, boolean seekplay)
+DESC: 
+
+### UpdateArrange
+C   : void UpdateArrange()
+LUA : reaper.UpdateArrange()
+DESC: Redraw the arrange view
+
+### Track_GetPeakInfo
+C   : double Track_GetPeakInfo(MediaTrack* track, int channel)
+LUA : number reaper.Track_GetPeakInfo(MediaTrack track, integer channel)
+DESC: Returns peak meter value (1.0=+0dB, 0.0=-inf) for channel. If channel==1024 or channel==1025, returns loudness values if this is the master track or this track's VU meters are set to display loudness.
+
+### MISSING: GetMasterPeak

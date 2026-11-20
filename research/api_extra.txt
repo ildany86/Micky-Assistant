@@ -1,0 +1,50 @@
+﻿### InsertTrackInProject
+C: void InsertTrackInProject(ReaProject* proj, int idx, int flags)
+LUA: reaper.InsertTrackInProject(ReaProject proj, integer idx, integer flags)
+DESC: inserts a track in project proj at idx, this will be clamped to 0..CountTracks(proj). flags&1 for default envelopes/FX, otherwise no enabled fx/envelopes will be added.
+
+### AddRegionOrMarker
+C: ProjectMarker* AddRegionOrMarker(ReaProject* proj, bool isrgn, double pos, double rgnend, const char* name, int wantidx, int color)
+LUA: ProjectMarker reaper.AddRegionOrMarker(ReaProject proj, boolean isrgn, number pos, number rgnend, string name, integer wantidx, integer color)
+DESC: Supply wantidx>=0 if you want a particular index number, but you'll get a different index number if wantidx is already in use. color should be 0 (default color), or ColorToNative(r,g,b)|0x1000000
+
+### GetNumRegionsOrMarkers
+C: int GetNumRegionsOrMarkers(ReaProject* proj)
+LUA: integer reaper.GetNumRegionsOrMarkers(ReaProject proj)
+DESC: the total number of regions and markers in the project. See GetRegionOrMarker, GetRegionOrMarkerInfo_Value, SetRegionOrMarkerInfo_Value, GetSetRegionOrMarkerInfo_String
+
+### GetRegionOrMarker
+C: ProjectMarker* GetRegionOrMarker(ReaProject* proj, int index, const char* guidStr)
+LUA: ProjectMarker reaper.GetRegionOrMarker(ReaProject proj, integer index, string guidStr)
+DESC: get a single region or marker by internal index, or if index < 0, by GUID. See GetNumRegionsOrMarkers, GetRegionOrMarkerInfo_Value, SetRegionOrMarkerInfo_Value, GetSetRegionOrMarkerInfo_String
+
+### SetRegionOrMarkerInfo_Value
+C: double SetRegionOrMarkerInfo_Value(ReaProject* proj, ProjectMarker* regionOrMarker, const char* parameterName, double setNewValue)
+LUA: number reaper.SetRegionOrMarkerInfo_Value(ReaProject proj, ProjectMarker regionOrMarker, string parameterName, number setNewValue)
+DESC: "D_STARTPOS", "D_ENDPOS" (= D_STARTPOS for markers), "I_NUMBER" (displayed index number), "I_LANENUMBER" (can be set, but returned value is read-only, "I_CUSTOMCOLOR", "B_UISEL", "B_HIDDEN". See GetNumRegionsOrMarkers, GetRegionOrMarker, GetRegionOrMarkerInfo_Value, GetSetRegionOrMarkerInfo_String
+
+### GetSetRegionOrMarkerInfo_String
+C: bool GetSetRegionOrMarkerInfo_String(ReaProject* proj, ProjectMarker* regionOrMarker, const char* parameterName, char* stringNeedBig, bool setNewValue)
+LUA: boolean retval, string stringNeedBig = reaper.GetSetRegionOrMarkerInfo_String(ReaProject proj, ProjectMarker regionOrMarker, string parameterName, string stringNeedBig, boolean setNewValue)
+DESC: "GUID" (read-only), "P_NAME". See GetNumRegionsOrMarkers, GetRegionOrMarker, GetRegionOrMarkerInfo_Value, SetRegionOrMarkerInfo_Value
+
+### Main_SaveProjectEx
+C: void Main_SaveProjectEx(ReaProject* proj, const char* filename, int options)
+LUA: reaper.Main_SaveProjectEx(ReaProject proj, string filename, integer options)
+DESC: Save the project. options: &1=save selected tracks as track template, &2=include media with track template, &4=include envelopes with track template, &8=if not saving template, set as the new project filename for this ReaProject. See Main_openProject, Main_SaveProject.
+
+### TrackFX_GetParamEx
+C: double TrackFX_GetParamEx(MediaTrack* track, int fx, int param, double* minvalOut, double* maxvalOut, double* midvalOut)
+LUA: number retval, number minval, number maxval, number midval = reaper.TrackFX_GetParamEx(MediaTrack track, integer fx, integer param)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track). FX indices can have 0x2000000 added to them, in which case they will be used to address FX in containers. To address a container, the 1-based subitem is multiplied by one plus the count of the FX chain and added to the 1-based container item index. e.g. to address the third item in the container at the second position of the track FX chain for tr, the index would be 0x2000000 + 3*(TrackFX_GetCount(tr)+1) + 2. This can be extended to sub-containers using TrackFX_GetNamedConfigParm with container_count and similar logic. In REAPER v7.06+, you can use the much more convenient method to navigate hierarchies, see TrackFX_GetNamedConfigParm with parent_container and container_item.X.
+
+### TrackFX_SetParamNormalized
+C: bool TrackFX_SetParamNormalized(MediaTrack* track, int fx, int param, double value)
+LUA: boolean reaper.TrackFX_SetParamNormalized(MediaTrack track, integer fx, integer param, number value)
+DESC: FX indices for tracks can have 0x1000000 added to them in order to reference record input FX (normal tracks) or hardware output FX (master track). FX indices can have 0x2000000 added to them, in which case they will be used to address FX in containers. To address a container, the 1-based subitem is multiplied by one plus the count of the FX chain and added to the 1-based container item index. e.g. to address the third item in the container at the second position of the track FX chain for tr, the index would be 0x2000000 + 3*(TrackFX_GetCount(tr)+1) + 2. This can be extended to sub-containers using TrackFX_GetNamedConfigParm with container_count and similar logic. In REAPER v7.06+, you can use the much more convenient method to navigate hierarchies, see TrackFX_GetNamedConfigParm with parent_container and container_item.X.
+
+### GetLastTouchedTrack
+C: MediaTrack* GetLastTouchedTrack()
+LUA: MediaTrack reaper.GetLastTouchedTrack()
+DESC: 
+
