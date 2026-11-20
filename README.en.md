@@ -82,10 +82,12 @@ audio.
 
 ## Getting started
 
-**Just want to try it?** Download the **portable** build (no Python needed)
-from the [latest release](https://github.com/ildany86/Micky-Assistant/releases/latest):
-unzip and run `Miky.exe`. The first run downloads the voice model and asks
-for your API key in Settings.
+**Just want to try it?** Download the **installer** from the
+[latest release](https://github.com/ildany86/Micky-Assistant/releases/latest):
+it installs per user (no admin), creates a shortcut and includes a **first-run
+wizard** for microphone, API key and the REAPER bridge.
+
+There is also a **portable** ZIP: unzip and run `Miky.exe`.
 
 ## From source
 

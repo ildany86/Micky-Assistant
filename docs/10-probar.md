@@ -69,7 +69,18 @@ cerrado). Si querés, es el próximo hito técnico.
 
 ## Parte 2 — Para el que prueba (copiar y pegar)
 
-### Opción rápida: versión portable (sin Python)
+### Opción rápida: instalador (recomendado)
+
+1. Descargá `Miky-…-setup.exe` desde
+   [Releases](https://github.com/ildany86/Micky-Assistant/releases/latest).
+2. Ejecutalo: se instala **por usuario**, sin pedir administrador.
+3. Al abrirlo, el **asistente de primera vez** te guía: micrófono con medidor
+   en vivo, API key con prueba de conexión y instalación del puente.
+
+Para desinstalarlo: *Configuración → Aplicaciones → Miky → Desinstalar*. No
+borra tu configuración (`%APPDATA%\Miky`) salvo que la elimines a mano.
+
+### Opción portable (sin instalar)
 
 1. Descargá el ZIP desde
    [Releases](https://github.com/ildany86/Micky-Assistant/releases/latest).

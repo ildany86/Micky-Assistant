@@ -78,10 +78,14 @@ La nube solo recibe el texto de la orden y el estado del proyecto, nunca audio.
 
 ## Puesta en marcha
 
-**¿Solo querés probarlo?** Descargá la versión **portable** (sin Python) del
+**¿Solo querés probarlo?** Descargá el **instalador** del
 [último release](https://github.com/ildany86/Micky-Assistant/releases/latest):
-descomprimís y abrís `Miky.exe`. La primera vez descarga el modelo de voz y
-pide la API key en Ajustes.
+se instala por usuario (no pide administrador), crea el acceso directo y trae
+un **asistente de primera vez** que configura micrófono, API key y el puente de
+REAPER en un minuto.
+
+También está la versión **portable** (ZIP, sin instalar): descomprimís y abrís
+`Miky.exe`.
 
 ## Desde el código
 
