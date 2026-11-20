@@ -72,19 +72,18 @@ class ChunkBuffer:
 
 
 def find_silero_model() -> Path | None:
-    candidates: list[Path] = []
-    try:
-        import silero_vad
+    """Busca el modelo ONNX del VAD.
 
-        base = Path(silero_vad.__file__).resolve().parent
-        candidates.append(base / "data" / "silero_vad.onnx")
-        candidates.append(base / "data" / "silero_vad_16k_op15.onnx")
-    except Exception:  # noqa: BLE001 - sin el paquete
-        pass
+    Se empaqueta con Miky (`data/models/silero_vad.onnx`) para no depender del
+    paquete `silero_vad`, que arrastra PyTorch entero. Si alguien quiere usar
+    otra versión, puede dejarla en `%APPDATA%\\Miky\\models`.
+    """
     from .. import paths
 
-    candidates.append(paths.models_dir() / "silero_vad.onnx")
-    for candidate in candidates:
+    for candidate in (
+        paths.data_dir() / "models" / "silero_vad.onnx",
+        paths.models_dir() / "silero_vad.onnx",
+    ):
         if candidate.exists():
             return candidate
     return None

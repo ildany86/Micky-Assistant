@@ -24,6 +24,7 @@ dependencies = [
 [project.optional-dependencies]
 voice = ["faster-whisper>=1.2", "onnxruntime>=1.18"]
 dev = ["pytest>=8", "lupa>=2"]
+exe = ["pyinstaller>=6.10"]
 
 [project.scripts]
 miky = "miky.__main__:main"

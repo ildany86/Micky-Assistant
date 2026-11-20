@@ -106,6 +106,20 @@ Miky») y decí **«Miky…»**.
 
 Guía detallada: [`docs/05-instalacion-uso.md`](docs/05-instalacion-uso.md).
 
+### Ejecutable (en preparación)
+
+Se puede empaquetar con PyInstaller:
+
+```powershell
+.venv\Scripts\python.exe -m pip install pyinstaller
+.venv\Scripts\python.exe tools\build_exe.py
+```
+
+Genera `dist/Miky/Miky.exe` (sin consola). Todavía no es la vía oficial de
+instalación: el empaquetado de Qt + Whisper + onnxruntime es lento y está en
+pruebas. Mientras tanto, la instalación recomendada sigue siendo
+`instalar.bat`.
+
 ## Comandos de consola
 
 ```powershell

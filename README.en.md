@@ -108,6 +108,19 @@ Then open REAPER (the icon menu has “Open REAPER with Miky”) and say **“Mi
 
 Detailed guide (Spanish): [`docs/05-instalacion-uso.md`](docs/05-instalacion-uso.md).
 
+### Executable (work in progress)
+
+It can be packaged with PyInstaller:
+
+```powershell
+.venv\Scripts\python.exe -m pip install pyinstaller
+.venv\Scripts\python.exe tools\build_exe.py
+```
+
+It produces `dist/Miky/Miky.exe` (no console). This is not yet the official
+install path: bundling Qt + Whisper + onnxruntime is slow and still being
+tested. For now, `instalar.bat` remains the recommended way.
+
 ## Console commands
 
 ```powershell
