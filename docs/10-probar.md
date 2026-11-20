@@ -69,6 +69,21 @@ cerrado). Si querés, es el próximo hito técnico.
 
 ## Parte 2 — Para el que prueba (copiar y pegar)
 
+### Opción rápida: versión portable (sin Python)
+
+1. Descargá el ZIP desde
+   [Releases](https://github.com/ildany86/Micky-Assistant/releases/latest).
+2. Descomprimilo en una carpeta, por ejemplo `C:\Miky`.
+3. Abrí **`Miky.exe`** (la primera vez descarga el modelo de voz, ~150 MB).
+4. Clic derecho en el ícono → **Ajustes** → pegá tu API key de Gemini.
+5. Abrí REAPER: el puente se instala solo la primera vez.
+
+No requiere Python ni permisos de administrador. Ocupa 368 MB
+descomprimido. Windows puede mostrar un aviso de SmartScreen porque el
+ejecutable no está firmado: *Más información → Ejecutar de todos modos*.
+
+### Opción desde el código (requiere Python)
+
 ### Antes de empezar
 
 - **Windows 10 u 11** y **REAPER 7** instalado.

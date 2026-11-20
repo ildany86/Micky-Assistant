@@ -78,6 +78,13 @@ La nube solo recibe el texto de la orden y el estado del proyecto, nunca audio.
 
 ## Puesta en marcha
 
+**¿Solo querés probarlo?** Descargá la versión **portable** (sin Python) del
+[último release](https://github.com/ildany86/Micky-Assistant/releases/latest):
+descomprimís y abrís `Miky.exe`. La primera vez descarga el modelo de voz y
+pide la API key en Ajustes.
+
+## Desde el código
+
 Requisitos: Windows 10/11, REAPER 7, Python 3.11+.
 
 ```powershell

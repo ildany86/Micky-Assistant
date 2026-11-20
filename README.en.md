@@ -82,6 +82,13 @@ audio.
 
 ## Getting started
 
+**Just want to try it?** Download the **portable** build (no Python needed)
+from the [latest release](https://github.com/ildany86/Micky-Assistant/releases/latest):
+unzip and run `Miky.exe`. The first run downloads the voice model and asks
+for your API key in Settings.
+
+## From source
+
 Requirements: Windows 10/11, REAPER 7, Python 3.11+.
 
 ```powershell
