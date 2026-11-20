@@ -25,6 +25,45 @@ def _set_favorites(harness: LuaHarness, items: list[str], folder: str = "Favorit
     harness.lua.execute(f"MOCK.resource_path = [[{resource}]]")
 
 
+def _set_recent_projects(harness: LuaHarness, paths: list[str]) -> None:
+    """Escribe un reaper.ini con la lista de proyectos recientes."""
+    resource = Path(tempfile.mkdtemp(prefix="miky_rpp_")) / "REAPER"
+    resource.mkdir(parents=True, exist_ok=True)
+    lines = ["[reaper]", "lastproject=", "[Recent]"]
+    for index, path in enumerate(paths, start=1):
+        lines.append(f"recent{index:02d}={path}")
+    (resource / "reaper.ini").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    harness.lua.execute(f"MOCK.resource_path = [[{resource}]]")
+
+
+def test_abrir_proyecto_por_nombre(harness: LuaHarness) -> None:
+    _set_recent_projects(harness, [r"C:\Musica\Tema Uno.rpp", r"C:\Musica\Otro.rpp"])
+    result = harness.run_ok("project.open", {"name": "tema uno"})
+    assert result["opened"] is True
+    assert result["path"].endswith("Tema Uno.rpp")
+    assert result["name"] == "Tema Uno"
+
+
+def test_abrir_proyecto_ambiguo_ofrece_opciones(harness: LuaHarness) -> None:
+    _set_recent_projects(harness, [r"C:\Musica\Tema Uno.rpp", r"C:\Musica\Tema Dos.rpp"])
+    error = harness.run_error("project.open", {"name": "tema"})
+    assert error["code"] == "project_candidates"
+    assert len(error["candidates"]) == 2
+
+
+def test_abrir_proyecto_inexistente(harness: LuaHarness) -> None:
+    _set_recent_projects(harness, [r"C:\Musica\Otro.rpp"])
+    error = harness.run_error("project.open", {"name": "zzzz"})
+    assert error["code"] == "project_not_found"
+
+
+def test_abrir_guarda_antes_si_se_pide(harness: LuaHarness) -> None:
+    _set_recent_projects(harness, [r"C:\Musica\Tema Uno.rpp"])
+    harness.lua.execute("MOCK.saved = false")
+    harness.run_ok("project.open", {"name": "Tema Uno", "save_current": True})
+    assert harness.lua.eval("MOCK.saved") is True
+
+
 def test_favoritos_de_reaper_se_listan(harness: LuaHarness) -> None:
     _set_favorites(harness, [r"C:\Plugins\Eamut Drums Compressor.vst3"])
     result = harness.run_ok("fx.favorites")

@@ -292,6 +292,18 @@ def _build_rename(match, orig):
     return "track.rename", {"track": track, "name": name}
 
 
+def _build_open_project(match, orig):
+    raw = (orig("name") or "").strip()
+    # "el proyecto de ayer" no es un nombre: que lo resuelva la IA (o pregunte).
+    if re.match(r"^(?:de |del |que )", raw, flags=re.IGNORECASE):
+        return None
+    name = re.sub(r"^(?:el|la)\s+", "", raw, flags=re.IGNORECASE).strip()
+    name = strip_article(name)
+    if len(name) < 3:
+        return None
+    return "project.open", {"name": name}
+
+
 def _build_tempo(match, orig):
     bpm = parse_number(match.group("bpm"))
     if bpm is None or bpm <= 0:
@@ -544,8 +556,29 @@ RULES: list[Rule] = [
         "desactivá el loop",
     ),
     # ---------------------------------------------------------------- proyecto
-    Rule("undo", re.compile(r"(?:deshace|deshacer|undo|un paso atras)"), _const("project.undo"), "deshacé"),
-    Rule("redo", re.compile(r"(?:rehace|rehacer|redo)"), _const("project.redo"), "rehacé"),
+    Rule(
+        "undo",
+        re.compile(
+            r"(?:deshace|deshacer|deshacelo|deshace eso|deshace lo ultimo|undo|"
+            r"volve atras|volver atras|un paso atras|paso atras)"
+        ),
+        _const("project.undo"),
+        "deshacé lo último",
+    ),
+    Rule(
+        "redo",
+        re.compile(r"(?:rehace|rehacer|rehacelo|rehace eso|redo)"),
+        _const("project.redo"),
+        "rehacé",
+    ),
+    Rule(
+        "open_project",
+        re.compile(
+            r"(?:abri|abrime|abre|abrir|carga|cargame|cargar|abrime) (?:el |la )?proyecto (?P<name>.+)"
+        ),
+        _build_open_project,
+        "abrí el proyecto Free From Adiction",
+    ),
     Rule(
         "save",
         re.compile(r"(?:guarda|guardar|salva|salvar)(?: los cambios| el proyecto)?"),

@@ -50,6 +50,11 @@ CASES: list[tuple[str, str | None]] = [
     ("dejá el bajo en solo", "track.solo"),
     ("borrá la 3", "track.delete"),
     ("pintá la pista 2 de violeta", "track.set_color"),
+    # deshacer / abrir proyecto
+    ("deshacé lo último", "project.undo"),
+    ("volvé atrás", "project.undo"),
+    ("rehacé", "project.redo"),
+    ("abrí el proyecto Free From Adiction", "project.open"),
     # frases reales del registro de voz
     ("la pista 23, un decibel más bajo", "track.adjust_volume"),
     ("la batería, un decibel más arriba", "track.adjust_volume"),
@@ -124,6 +129,8 @@ def test_argumentos_de_algunos_casos() -> None:
     }
     assert router.match("poné el bajo en -6 dB")[1] == {"track": "bajo", "db": -6.0}
     assert router.match("renombrá la pista 2 como Batería")[1] == {"track": "2", "name": "Batería"}
+    assert router.match("abrí el proyecto Free From Adiction")[1] == {"name": "Free From Adiction"}
+    assert router.match("abrí el proyecto el Tema Nuevo")[1] == {"name": "Tema Nuevo"}
     assert router.match("mandá la batería a las salidas 3 y 4")[1]["pair"] == 2
     assert router.match("creá una pista llamada Guitarra")[1] == {"name": "Guitarra"}
     assert router.match("agregá una pista")[1] == {}

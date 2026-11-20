@@ -278,8 +278,8 @@ desinstalador no deja ni el puente ni el bloque de startup.
 
 ### Riesgos
 
-- **Licencias.** Distribuir con Piper (GPL-3.0) obliga a abrir el producto.
-  Decidir antes de la 1.0 (ver [riesgos abiertos](#riesgos-abiertos)).
+- **Licencias.** Resuelto: Miky es **GPL-3.0** (software libre, repo público), así que
+  edge-tts y Piper son compatibles. Sólo hay que citar los componentes en [NOTICE.md](../NOTICE.md).
 - **Cuota real con usuarios.** Un usuario intensivo puede pasar los 100 pedidos
   diarios. Hay que mostrar el consumo y ofrecer su propia API key.
 - **Soporte multi-versión.** REAPER 7.5, 7.84 y 8.0 pueden comportarse distinto.
@@ -345,7 +345,7 @@ plan completo en un paso.
 | **Latencia** | El pedido tarda y el usuario repite o se frustra | mediana de 31–47 ms en el puente, planes de una sola consulta | objetivo 0.2: p95 < 2,5 s de punta a punta; medir STT + red + ejecución por separado |
 | **Precisión del STT con ruido de estudio** | Con monitoreo abierto, batería o bleed, el texto sale mal y el comando también | VAD Silero, palabra clave, confirmación en acciones destructivas | pruebas con ruido real, `small` como opción, y micrófono distinto al de REAPER |
 | **Conflicto de audio con ASIO** | «No me escucha»: el asistente no puede abrir el dispositivo que REAPER tomó en exclusiva | por diseño usa otro dispositivo (WASAPI, micrófono interno) y lo explica en `doctor` | detectar el conflicto automáticamente y ofrecer cambiar de micrófono en el momento |
-| **Licencias de voces y modelos** | Distribuir con una voz GPL obliga a abrir el producto; algunos modelos de wake word no son comerciales | Whisper (MIT) y SAPI (parte de Windows) son el camino seguro | decidir la voz de la 1.0: SAPI, Kokoro (Apache-2.0) o Piper si el producto va GPL |
+| **Licencias de voces y modelos** | Algunos modelos de wake word no son comerciales | el producto es GPL-3.0, así que edge-tts (GPL) y Piper son compatibles; Whisper es MIT | documentar cada componente en [NOTICE.md](../NOTICE.md) y evitar modelos no comerciales |
 | **Privacidad** | El free tier de Gemini usa los prompts para entrenar; pueden ir nombres de clientes o de proyectos | aviso en la doc; la API key es del usuario | modo «solo router» visible en la UI y aviso en el onboarding |
 
 ---

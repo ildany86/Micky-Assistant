@@ -212,6 +212,22 @@ function reaper.Track_GetPeakInfo(track, channel)
   return MOCK.default_peak or 0.25
 end
 
+-- Abrir proyectos: se registra el pedido y se cambia el proyecto actual.
+function reaper.Main_openProject(path)
+  MOCK.opened_project = path
+  MOCK.project_file = (path or ""):gsub("^noprompt:", "")
+  return true
+end
+
+-- Listado de archivos de una carpeta (para buscar .rpp cerca del proyecto).
+function reaper.EnumerateFiles(dir, index)
+  local list = MOCK.dir_files and MOCK.dir_files[dir]
+  if not list then
+    return nil
+  end
+  return list[index + 1]
+end
+
 function reaper.InsertTrackInProject(_proj, index, _flags)
   local track = new_track("")
   table.insert(MOCK.tracks, index + 1, track)

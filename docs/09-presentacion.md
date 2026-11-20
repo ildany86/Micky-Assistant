@@ -109,4 +109,8 @@ La puesta en marcha está en el [README](../README.md#puesta-en-marcha).
 
 ## Licencia
 
-Propietario, todos los derechos reservados. Ver [LICENSE.md](../LICENSE.md).
+**Software libre bajo GPL-3.0**: podés usarlo, modificarlo y compartirlo; las
+versiones derivadas tienen que seguir siendo libres. Ver [LICENSE](../LICENSE) y
+[NOTICE](../NOTICE.md).
+
+Si te sirve, podés [invitarme un cafecito](../DONAR.md) ☕.

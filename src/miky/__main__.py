@@ -71,12 +71,48 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     from .ui.shell import MikyShell
 
+    _install_crash_hook()
     core.start_background()
     shell = MikyShell(core, config)
     try:
         return shell.run()
     finally:
         core.stop()
+
+
+def _install_crash_hook() -> None:
+    """Si algo revienta, queda en el log y no se pierde el rastro."""
+    import traceback
+
+    from . import log as log_mod
+
+    def hook(exc_type, exc_value, exc_tb):  # noqa: ANN001
+        if issubclass(exc_type, KeyboardInterrupt):
+            return
+        log_mod.get("miky.crash").critical(
+            "excepción no controlada:\n%s",
+            "".join(traceback.format_exception(exc_type, exc_value, exc_tb)),
+        )
+
+    sys.excepthook = hook
+
+
+def cmd_supervise(_args: argparse.Namespace) -> int:
+    """Arranca Miky y lo reinicia si se cae (hasta 3 veces)."""
+    import subprocess
+
+    attempts = 0
+    while True:
+        process = subprocess.Popen([sys.executable, "-m", "miky", "run"])
+        code = process.wait()
+        if code == 0:
+            return 0
+        attempts += 1
+        if attempts > 3:
+            print("Miky se cerró con error 3 veces seguidas; no lo reinicio más.")
+            return code
+        print(f"Miky se cerró con error {code}; reiniciando ({attempts}/3)…")
+        time.sleep(3)
 
 
 def _console_loop(core) -> int:  # noqa: ANN001
@@ -414,6 +450,9 @@ def build_parser() -> argparse.ArgumentParser:
     diagnostics = sub.add_parser("diagnostics", help="empaqueta info y logs para reportar un problema")
     diagnostics.add_argument("--output", "-o", default="", help="ruta del ZIP (por defecto, el escritorio)")
     diagnostics.set_defaults(func=cmd_diagnostics)
+
+    supervise = sub.add_parser("supervise", help="arranca Miky y lo reinicia si se cae")
+    supervise.set_defaults(func=cmd_supervise)
 
     listen = sub.add_parser("listen", help="prueba de voz en consola")
     listen.set_defaults(func=cmd_listen)

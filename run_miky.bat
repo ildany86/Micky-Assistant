@@ -1,5 +1,6 @@
 @echo off
 rem Miky · arranque normal (sin ventana de consola)
+rem Usa el supervisor: si la app se cae, la vuelve a levantar sola.
 cd /d "%~dp0"
 
 if not exist ".venv\Scripts\pythonw.exe" (
@@ -9,4 +10,4 @@ if not exist ".venv\Scripts\pythonw.exe" (
     exit /b 1
 )
 
-start "" ".venv\Scripts\pythonw.exe" -m miky run
+start "" ".venv\Scripts\pythonw.exe" -m miky supervise

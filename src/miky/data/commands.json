@@ -620,6 +620,26 @@
       "examples": ["rehacé"]
     },
     {
+      "id": "project.open",
+      "category": "proyecto",
+      "summary": "Abre un proyecto de REAPER por nombre. Busca entre los proyectos recientes y en la carpeta del proyecto actual; si hay varios parecidos, devuelve las opciones. Cierra el proyecto actual (con confirmación previa).",
+      "params": {
+        "name": {
+          "type": "string",
+          "description": "Nombre del proyecto o parte: «Free From Adiction»."
+        },
+        "save_current": {
+          "type": "boolean",
+          "description": "Guardar el proyecto actual antes de abrir el otro.",
+          "default": false
+        }
+      },
+      "required": ["name"],
+      "danger": true,
+      "speech": "Abrí {name}.",
+      "examples": ["abrí el proyecto Free From Adiction", "cargá el proyecto tema nuevo"]
+    },
+    {
       "id": "project.set_tempo",
       "category": "proyecto",
       "summary": "Cambia el tempo (BPM) del proyecto.",

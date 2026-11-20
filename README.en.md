@@ -165,12 +165,17 @@ Beta 0.1, under active development. Tested end to end against REAPER 7.85 on
 Windows 11: every command in sequence, a real render and a clean shutdown, with
 no failures (`tools/live_test.py`).
 
+## Support the project
+
+Miky is free and open source. If it helps you, you can [buy me a coffee](DONAR.md) ☕.
+Testing it and reporting what breaks helps just as much
+([how to test](docs/10-probar.md)).
+
 ## License
 
-**Proprietary. All rights reserved.** The code is published for review and
-evaluation; redistribution, commercial modification or use in derivative
-products is not allowed without written permission from the author.
+**Free software under [GPL-3.0](LICENSE).** You may use, study, modify and share
+it; if you distribute a modified version, it must stay free and with the source
+available.
 
-If distributed, also review the licenses of the voice components and speech
-models (some Whisper variants and edge-tts voices have their own terms; see the
-[roadmap](docs/07-roadmap.md#riesgos-abiertos)).
+Copyright © 2026 Daniel Lugo. See [NOTICE.md](NOTICE.md) for details and the
+licenses of third-party components (Whisper, edge-tts, Qt, REAPER).

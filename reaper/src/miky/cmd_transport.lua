@@ -164,6 +164,138 @@ MIKY.cmd_transport = (function()
 
   -- ---------------- Proyecto ----------------
 
+  -- Proyectos recientes: REAPER los guarda en la seccion [Recent] de reaper.ini.
+  local function recent_projects()
+    local ini = reaper.GetResourcePath() .. '/reaper.ini'
+    local file = io.open(ini, 'r')
+    if not file then
+      return {}
+    end
+    local inside = false
+    local out = {}
+    for raw in file:lines() do
+      local line = raw:gsub('\r', '')
+      if line:match('^%[Recent%]$') then
+        inside = true
+      elseif line:match('^%[') then
+        inside = false
+      elseif inside then
+        local value = line:match('^recent%d+=(.+)$')
+        if value and value:lower():match('%.rpp$') and value ~= '' then
+          out[#out + 1] = value
+        end
+      end
+    end
+    file:close()
+    return out
+  end
+
+  local function score_project(path, wanted)
+    local base = path:match('([^/\\]+)$') or path
+    base = base:gsub('%.[Rr][Pp][Pp]$', '')
+    local folded_base = U.norm(base)
+    local folded_wanted = U.norm(wanted)
+    if folded_wanted == '' or folded_base == '' then
+      return 0
+    end
+    if folded_base == folded_wanted then
+      return 100
+    end
+    if folded_base:find(folded_wanted, 1, true) then
+      return 50 + math.min(20, #folded_wanted)
+    end
+    if #folded_base >= 4 and folded_wanted:find(folded_base, 1, true) then
+      return 20
+    end
+    return 0
+  end
+
+  -- Busca por nombre en los recientes y en la carpeta del proyecto actual.
+  local function find_projects(wanted)
+    local scored = {}
+    local seen = {}
+    local function add(path, score)
+      if path and score > 0 and not seen[path] then
+        seen[path] = true
+        scored[#scored + 1] = { path = path, score = score }
+      end
+    end
+    for _, path in ipairs(recent_projects()) do
+      add(path, score_project(path, wanted))
+    end
+
+    local _, current = reaper.EnumProjects(-1)
+    if current and current ~= '' then
+      local dir = current:match('^(.*)[/\\][^/\\]+$')
+      if dir and reaper.EnumerateFiles then
+        for index = 0, 300 do
+          local name = reaper.EnumerateFiles(dir, index)
+          if not name then
+            break
+          end
+          if name:lower():match('%.rpp$') then
+            add(dir .. '/' .. name, score_project(name, wanted))
+          end
+        end
+      end
+    end
+
+    table.sort(scored, function(a, b)
+      if a.score ~= b.score then
+        return a.score > b.score
+      end
+      return #a.path < #b.path
+    end)
+
+    local out = {}
+    local top = scored[1] and scored[1].score or 0
+    for _, entry in ipairs(scored) do
+      if entry.score < top or #out >= 5 then
+        break
+      end
+      out[#out + 1] = entry.path
+    end
+    return out
+  end
+
+  handlers['project.open'] = {
+    undo = false,
+    desc = 'Abrir un proyecto',
+    fn = function(args)
+      local wanted = U.str(args, 'name', { required = true })
+      local found = find_projects(wanted)
+      if #found == 0 then
+        U.fail(
+          'project_not_found',
+          'no encontre ningun proyecto que se parezca a "' .. wanted ..
+            '". Proba con el nombre del archivo .rpp.'
+        )
+      end
+      if #found > 1 then
+        error({
+          code = 'project_candidates',
+          message = 'encontre varios proyectos para "' .. wanted .. '": ' .. table.concat(found, ' / '),
+          candidates = found,
+        }, 0)
+      end
+      local path = found[1]
+      if args.save_current == true then
+        reaper.Main_SaveProject(0, false)
+      end
+      -- "noprompt:" evita el dialogo modal de guardar cambios: si no,
+      -- REAPER se queda esperando y el puente se traba.
+      local ok = reaper.Main_openProject('noprompt:' .. path)
+      if not ok then
+        U.fail('reaper_error', 'REAPER no pudo abrir ' .. path)
+      end
+      return {
+        opened = true,
+        path = path,
+        name = (path:match('([^/\\]+)$') or path):gsub('%.[Rr][Pp][Pp]$', ''),
+      }
+    end,
+  }
+
   handlers['project.save'] = {
     undo = false,
     desc = 'Guardar proyecto',
@@ -211,8 +343,12 @@ MIKY.cmd_transport = (function()
     undo = false,
     desc = 'Rehacer',
     fn = function()
+      local can = reaper.Undo_CanRedo2(0)
+      if can == nil then
+        return { redone = false, reason = 'no hay nada para rehacer' }
+      end
       reaper.Main_OnCommand(40030, 0) -- Edit: Redo
-      return { redone = true }
+      return { redone = true, action = can }
     end,
   }
 
