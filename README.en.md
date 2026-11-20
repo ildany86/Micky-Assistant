@@ -121,6 +121,7 @@ miky listen          # voice test in the terminal
 miky install-bridge  # reinstall the bridge in REAPER
 miky plugins         # list installed plugins (or search with -q compressor)
 miky knowledge       # technical mixing cards
+miky diagnostics     # bundle info and logs to report a problem
 ```
 
 ## Layout
@@ -156,6 +157,7 @@ docs/                architecture, protocol, catalog, roadmap
 | [Roadmap](docs/07-roadmap.md) | What comes next |
 | [Technical knowledge](docs/08-conocimiento.md) | Mixing cards behind the advice |
 | [Presentation](docs/09-presentacion.md) | One-page product overview |
+| [How to test](docs/10-probar.md) | Tester guide and how to share it |
 
 ## Status
 

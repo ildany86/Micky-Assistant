@@ -117,6 +117,7 @@ miky devices         # micrófonos detectados (y cuál elegiría)
 miky voices          # voces de Windows instaladas
 miky listen          # prueba de voz en consola
 miky install-bridge  # reinstalar el puente en REAPER
+miky diagnostics     # empaqueta info y logs para reportar un problema
 ```
 
 ## Estructura
@@ -152,6 +153,7 @@ docs/                arquitectura, protocolo, catálogo, roadmap
 | [Hoja de ruta](docs/07-roadmap.md) | Qué viene después |
 | [Conocimiento técnico](docs/08-conocimiento.md) | Fichas de mezcla y audio que sostienen los consejos |
 | [Presentación](docs/09-presentacion.md) | Resumen del producto en una página |
+| [Cómo probar](docs/10-probar.md) | Guía para quien lo prueba y cómo compartirlo |
 
 ## Estado
 

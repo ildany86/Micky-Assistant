@@ -214,6 +214,23 @@ def cmd_tools(_args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_diagnostics(args: argparse.Namespace) -> int:
+    """Arma un ZIP con todo lo necesario para diagnosticar un problema."""
+    from . import diagnostics
+
+    destination = Path(args.output).expanduser() if getattr(args, "output", "") else None
+    try:
+        path = diagnostics.collect(destination)
+    except Exception as exc:  # noqa: BLE001
+        print(f"No pude armar el diagnóstico: {exc}")
+        return 1
+    size_kb = path.stat().st_size / 1024
+    print(f"Diagnóstico listo: {path} ({size_kb:.0f} KB)")
+    print("Incluye versiones, doctor, dispositivos, config SIN la API key y los últimos logs.")
+    print("No incluye audio, proyectos ni rutas personales.")
+    return 0
+
+
 def cmd_install(args: argparse.Namespace) -> int:
     from . import reaper
 
@@ -393,6 +410,10 @@ def build_parser() -> argparse.ArgumentParser:
     install = sub.add_parser("install-bridge", help="instala el puente en REAPER")
     install.add_argument("--remove", action="store_true", help="desinstalar")
     install.set_defaults(func=cmd_install)
+
+    diagnostics = sub.add_parser("diagnostics", help="empaqueta info y logs para reportar un problema")
+    diagnostics.add_argument("--output", "-o", default="", help="ruta del ZIP (por defecto, el escritorio)")
+    diagnostics.set_defaults(func=cmd_diagnostics)
 
     listen = sub.add_parser("listen", help="prueba de voz en consola")
     listen.set_defaults(func=cmd_listen)
