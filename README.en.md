@@ -1,5 +1,9 @@
 # Miky
 
+![Miky, a voice assistant for REAPER](docs/img/hero.png)
+
+[Español](README.md) · **English**
+
 **A voice assistant for REAPER.** A floating microphone on your screen: you talk
 to it and it drives the session. It listens and speaks on your machine; only the
 language interpretation travels to the cloud.
