@@ -1,10 +1,14 @@
 # Miky
 
+![Miky, asistente de voz para REAPER](docs/img/hero.png)
+
+**Español** · [English](README.en.md)
+
 **Asistente de voz para REAPER.** Un micrófono flotante en la pantalla: le hablás
 y él maneja la sesión. Escucha y responde en tu computadora; solo la
 interpretación del lenguaje viaja a la nube.
 
-![Estados del icono](docs/img/estados.png)
+![El ícono en sus distintos estados](docs/img/icono.gif)
 
 Miky no es un plugin de REAPER, no es una ventana de aplicación y no toca nada
 fuera de REAPER: es un ícono que se arrastra por la pantalla y un motor que
@@ -33,7 +37,7 @@ Qué puede pedirle (ejemplos reales):
 > «Miky, poné el tempo en 96 y activá el metrónomo»
 > «Miky, renderizá la mezcla»
 
-El catálogo completo (51 comandos en esta beta) está en
+El catálogo completo (55 comandos en esta beta) está en
 [`docs/03-catalogo-comandos.md`](docs/03-catalogo-comandos.md).
 
 ## Cómo funciona
@@ -147,6 +151,7 @@ docs/                arquitectura, protocolo, catálogo, roadmap
 | [Referencias de REAPER](docs/06-referencias-reaper.md) | API, ReaPack y datos verificados |
 | [Hoja de ruta](docs/07-roadmap.md) | Qué viene después |
 | [Conocimiento técnico](docs/08-conocimiento.md) | Fichas de mezcla y audio que sostienen los consejos |
+| [Presentación](docs/09-presentacion.md) | Resumen del producto en una página |
 
 ## Estado
 
