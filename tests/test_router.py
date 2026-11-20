@@ -55,6 +55,16 @@ CASES: list[tuple[str, str | None]] = [
     ("volvé atrás", "project.undo"),
     ("rehacé", "project.redo"),
     ("abrí el proyecto Free From Adiction", "project.open"),
+    # cómo lo escribe Whisper (formas indicativas y erratas reales)
+    ("pone el tempo en 96", "project.set_tempo"),
+    ("grava", "transport.record"),
+    ("borrar la pista 3", "track.delete"),
+    ("insertar un compresor en la voz", "fx.add"),
+    ("bajá la voz un decibel", "track.adjust_volume"),
+    ("subí el bajo 12b", "track.adjust_volume"),
+    ("paniala guitarra al izquierda", "track.set_pan"),
+    ("abril a matriz de ruteo", "view.routing"),
+    ("render y sal a mezcla", "render.start"),
     # frases reales del registro de voz
     ("la pista 23, un decibel más bajo", "track.adjust_volume"),
     ("la batería, un decibel más arriba", "track.adjust_volume"),

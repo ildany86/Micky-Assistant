@@ -43,14 +43,18 @@ VARIANTS = {
         "migui",
         "viki",
         "viky",
+        "vicky",
+        "vicki",
         "viqui",
         "biki",
         "biqui",
+        "bicky",
         "niki",
         "bigui",
         "maiki",
         "mayki",
         "miqi",
+        "miki",
     ),
     "tuka": ("tuka", "tuca"),
     "beto": ("beto", "veto"),
@@ -127,6 +131,22 @@ NEUTRAL = {
 
 _TOKEN = re.compile(r"[0-9A-Za-zÁÉÍÓÚÑÜáéíóúñü]+")
 
+# Cuando el nombre se parte en dos ("mi que"), solo se acepta si lo que sigue
+# parece una orden. Si sigue un artículo o preposición, es una frase cualquiera.
+_NON_COMMAND_STARTS = {
+    "el", "la", "los", "las", "un", "una", "unos", "unas",
+    "de", "del", "que", "y", "a", "al", "en", "con", "por", "para",
+    "mi", "tu", "su", "es", "esta", "este", "eso", "lo", "se", "te", "me",
+    "muy", "más", "mas", "no", "sí", "si",
+}
+
+
+def _starts_like_command(rest: str) -> bool:
+    tokens = _TOKEN.findall(rest or "")
+    if not tokens:
+        return False
+    return normalize(tokens[0]) not in _NON_COMMAND_STARTS
+
 
 def normalize(text: str) -> str:
     text = unicodedata.normalize("NFD", text or "")
@@ -158,11 +178,44 @@ def _distance(a: str, b: str) -> int:
     return previous[-1]
 
 
+def _phonetic(word: str) -> str:
+    """Reduce la palabra a cómo suena, para que "vicky" y "miky" se parezcan.
+
+    Whisper escribe lo que oye: v/b, c/qu/k, y/i son la misma cosa para el
+    oído. Normalizando antes de comparar, una sola lista de variantes cubre
+    decenas de transcripciones posibles.
+    """
+    word = normalize(word)
+    word = word.replace("qu", "k").replace("ck", "k").replace("cc", "k")
+    word = word.replace("v", "b")
+    word = word.replace("z", "s")
+    word = word.replace("y", "i")
+    word = re.sub(r"c(?=[ei])", "s", word)
+    word = re.sub(r"(.)\1+", r"\1", word)  # "mikki" -> "miki"
+    return word
+
+
+def _matches(candidate: str, variants: tuple[str, ...]) -> bool:
+    if not candidate:
+        return False
+    folded = normalize(candidate)
+    if folded in variants:
+        return True
+    # Forma fonética: "biqui" y "vicky" terminan siendo "biki"/"biki".
+    sounds = _phonetic(candidate)
+    for variant in variants:
+        if sounds == _phonetic(variant):
+            return True
+        if _distance(sounds, _phonetic(variant)) <= 1:
+            return True
+    return any(_distance(folded, variant) <= 1 for variant in variants)
+
+
 def split_wake(text: str, wake_word: str) -> tuple[bool, str]:
     """Devuelve (activado, resto_de_la_frase).
 
     Acepta el nombre al principio, con o sin un prefijo coloquial ("che", "ok"),
-    y tolera una letra de diferencia.
+    y tolera variantes de pronunciación ("Vicky", "Biqui", "Migui").
     """
     if not text:
         return False, ""
@@ -179,18 +232,22 @@ def split_wake(text: str, wake_word: str) -> tuple[bool, str]:
     if index >= len(tokens):
         return False, ""
 
-    candidate = normalize(tokens[index].group(0))
-    if len(candidate) < 3:
-        return False, ""
-
-    matched = candidate in variants or any(
-        _distance(candidate, variant) <= 1 for variant in variants
-    )
-    if not matched:
-        return False, ""
-
-    rest = text[tokens[index].end() :]
-    return True, rest.strip(" ,.:;!?¡¿-–")
+    # Primero una palabra; si no, dos juntas ("mi que", "mig ui").
+    for span in (1, 2):
+        if index + span > len(tokens):
+            continue
+        candidate = "".join(tokens[index + offset].group(0) for offset in range(span))
+        if len(normalize(candidate)) < 3:
+            continue
+        if not _matches(candidate, variants):
+            continue
+        rest = text[tokens[index + span - 1].end() :]
+        rest = rest.strip(" ,.:;!?¡¿-–")
+        # "mi que el volumen" no es una orden: se descarta.
+        if span == 2 and rest and not _starts_like_command(rest):
+            continue
+        return True, rest
+    return False, ""
 
 
 def parse_yes_no(text: str) -> bool | None:

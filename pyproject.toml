@@ -9,7 +9,7 @@ description = "Miky: asistente de voz local para REAPER (escucha y habla local, 
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "GPL-3.0-or-later" }
-authors = [{ name = "Daniel Lugo" }]
+authors = [{ name = "Daniel Orlando Lugo" }]
 keywords = ["reaper", "asistente", "voz", "reaScript", "gemini", "gpl"]
 dependencies = [
   "PySide6>=6.7",

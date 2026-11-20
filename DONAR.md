@@ -3,13 +3,11 @@
 Miky es **gratis y libre** (GPL-3.0). No hay versión paga, ni funciones
 bloqueadas, ni publicidad dentro de la app.
 
-Si te resulta útil y querés que siga creciendo, podés invitarme un cafecito:
+Si te resulta útil y querés que siga creciendo, podés colaborar así:
 
-<!-- Reemplazá estos enlaces por los tuyos -->
-
-- ☕ **Cafecito**: <https://cafecito.app/TUUSUARIO>
-- 💸 **Mercado Pago**: <https://link.mercadopago.com.ar/TUUSUARIO>
-- 🅿️ **PayPal**: <https://paypal.me/TUUSUARIO>
+- 💸 **Mercado Pago** (alias `dlugo.mp`):
+  <https://link.mercadopago.com.ar/dlugo.mp>
+- ☕ **Cafecito**: _(pendiente de configurar)_
 
 ## Otras formas de ayudar que no cuestan dinero
 

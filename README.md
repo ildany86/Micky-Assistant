@@ -25,6 +25,7 @@ ejecuta un catálogo cerrado de comandos sobre la API del DAW.
   transporte, marcadores, tempo y render.
 - **Busca plugins por descripción** («un compresor estilo bus de SSL») y, si hay varios, te da opciones numeradas.
 - **Pregunta antes de romper algo**: borrar pistas, renderizar o guardar encima.
+- **Se calla si lo interrumpís**: hablale encima y te escucha sin esperar a que termine.
 - **Pregunta «¿estás listo?» antes de grabar** y arranca en silencio, para que su voz no quede en la toma.
 - **Sigue funcionando sin internet** para las órdenes básicas (router local).
 - **Te responde consejos** de grabación y mezcla si le preguntás (sin tocar nada).
@@ -173,5 +174,5 @@ También ayuda muchísimo probarlo y contar qué falla
 y compartirlo; si distribuís una versión modificada, tiene que seguir siendo
 libre y con el código disponible.
 
-Copyright © 2026 Daniel Lugo. Ver [NOTICE.md](NOTICE.md) para el detalle y las
+Copyright © 2026 Daniel Orlando Lugo. Ver [NOTICE.md](NOTICE.md) para el detalle y las
 licencias de los componentes de terceros (Whisper, edge-tts, Qt, REAPER).

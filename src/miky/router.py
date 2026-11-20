@@ -228,7 +228,11 @@ def _build_with_state(command: str, state: bool):
 
 def _build_volume(match, orig):
     track = _track(match, orig)
-    db = parse_number(match.group("db"))
+    raw = match.group("db")
+    db = parse_number(raw)
+    if db is None:
+        # "12b" / "3db": Whisper pega la unidad al número.
+        db = parse_number(re.sub(r"(?i)\s*(?:db|b)$", "", raw or ""))
     if not track or db is None:
         return None
     if match.group("dir").startswith("baj") or match.group("dir").startswith("reduc"):
@@ -510,7 +514,7 @@ RULES: list[Rule] = [
     Rule(
         "record",
         re.compile(
-            r"(?:dale )?(?:graba|grabar|record|a grabar|empeza a grabar|arranca a grabar|"
+            r"(?:dale )?(?:graba|grava|gravar|grabar|record|a grabar|empeza a grabar|arranca a grabar|"
             r"empecemos a grabar|grabemos|grabale)"
         ),
         _const("transport.record"),
@@ -559,7 +563,7 @@ RULES: list[Rule] = [
     Rule(
         "undo",
         re.compile(
-            r"(?:deshace|deshacer|deshacelo|deshace eso|deshace lo ultimo|undo|"
+            r"(?:deshace|deshacer|deshacelo|deshacelo ultimo|deshacelo lo ultimo|deshace eso|deshace lo ultimo|undo|"
             r"volve atras|volver atras|un paso atras|paso atras)"
         ),
         _const("project.undo"),
@@ -641,10 +645,21 @@ RULES: list[Rule] = [
         "exportá a -14 LUFS",
     ),
     Rule("render", re.compile(r"(?:renderiza|renderizar|render|exporta|exportar)(?: la mezcla| el proyecto| todo)?"), _build_render, "renderizá la mezcla"),
+    # Whisper a veces intercala palabras ("render y sal a mezcla"): si aparece
+    # "render" y la palabra mezcla/master, es un render de todos modos.
+    Rule(
+        "render_loose",
+        re.compile(
+            r"(?:renderiza|renderizar|render|exporta|exportar|rendi).*\b(?:mezcla|mix|master|proyecto|todo)\b"
+        ),
+        _build_render,
+        "render y sal a mezcla",
+        allow_multi=True,
+    ),
     # ---------------------------------------------------------------- vista
     Rule(
         "mixer_on",
-        re.compile(r"(?:abri|abre|abrime|mostrame|mostra|mostrar|desplega) el (?:mixer|mezclador)"),
+        re.compile(r"(?:abri|abril|abre|abrime|mostrame|mostra|mostrar|desplega) (?:el |la )?(?:mixer|mezclador)"),
         _build_mixer(True),
         "abrí el mixer",
     ),
@@ -657,8 +672,8 @@ RULES: list[Rule] = [
     Rule(
         "routing_on",
         re.compile(
-            r"(?:abri|abre|abrime|mostrame|mostra|desplega) (?:la )?"
-            r"(?:matriz de ruteo|ventana de ruteo|matriz de enrutamiento|matriz de ruteo|ruteo)"
+            r"(?:abri|abril|abrir|abre|abrime|mostrame|mostra|desplega) (?:la |a |el )?"
+            r"(?:matriz de ruteo|ventana de ruteo|matriz de enrutamiento|ruteo|routing)"
         ),
         _const("view.routing"),
         "abrí la matriz de ruteo",
@@ -676,9 +691,10 @@ RULES: list[Rule] = [
     Rule(
         "volume",
         re.compile(
-            r"(?P<dir>subi|sube|subile|subele|baja|bajale|bajale|aumenta|reduce|reducele) "
+            r"(?P<dir>subi|sube|subile|subele|subir|baja|bajale|bajar|aumenta|aumentar|reduce|reducir|reducele) "
             r"(?:el |la )?(?:volumen|ganancia|nivel)? ?(?:de |del |de la )?"
-            r"(?:la pista |el |la )?(?P<track>.+?) (?P<db>-?[\w.,]+)(?: db| decibeles)?"
+            r"(?:a la pista |a el |a la |la pista |el |la )?(?P<track>.+?) "
+            r"(?P<db>-?[\w.,]+) ?(?:db|b|decibel(?:es)?|puntos?)?"
         ),
         _build_volume,
         "subí la guitarra 2 dB",
@@ -705,7 +721,7 @@ RULES: list[Rule] = [
         "volume_inverted",
         re.compile(
             r"(?:el |la )?volumen (?:de |del |de la )?(?:la pista |el |la )?(?P<track>.+?) "
-            r"(?P<dir>subilo|subile|subi|bajalo|bajale|baja) (?P<db>-?[\w.,]+)(?: db| decibeles)?"
+            r"(?P<dir>subilo|subile|subi|bajalo|bajale|baja) (?P<db>-?[\w.,]+)(?: ?(?:db|decibel(?:es)?|puntos?))?"
         ),
         _build_volume,
         "el volumen de la pista 2, subilo 3 dB",
@@ -713,7 +729,7 @@ RULES: list[Rule] = [
     Rule(
         "pan_side",
         re.compile(
-            r"(?:panea|paneale|pone|pon|deja|manda) (?:la pista |el |la )?(?P<track>.+?) "
+            r"(?:panea|pania|paniala|panialo|paneale|panear|pone|pon|deja|manda) (?:la pista |el |la )?(?P<track>.+?) "
             r"(?P<amount>\d+)? ?%? ?(?:a la |a |al |hacia la |hacia el )?(?P<side>izquierda|derecha|centro)"
         ),
         _build_pan,
@@ -805,14 +821,14 @@ RULES: list[Rule] = [
     ),
     Rule(
         "delete_track",
-        re.compile(r"(?:borra|elimina|saca|quita) la pista (?P<track>.+)"),
+        re.compile(r"(?:borra|borrar|elimina|eliminar|saca|sacar|quita|quitar) (?:la |a |esta )?pista (?P<track>.+)"),
         _build_delete,
         "borrá la pista 3",
     ),
     Rule("duplicate", re.compile(r"(?:duplica|clona|duplicame) (?:la pista )?(?P<track>.+)"), _build_duplicate, "duplicá la voz"),
     Rule(
         "delete_number",
-        re.compile(r"(?:borra|elimina|saca|quita) (?:la|el) (?P<track>\d+)"),
+        re.compile(r"(?:borra|borrar|elimina|eliminar|saca|sacar|quita|quitar) (?:la|el) (?P<track>\d+)"),
         _build_delete,
         "borrá la 3",
     ),
@@ -873,7 +889,8 @@ RULES: list[Rule] = [
     Rule(
         "send_add",
         re.compile(
-            r"(?:manda|mandale|envia|enviale|rutea) (?:la pista |el |la )?(?P<from>.+?) (?:a|al|a la) "
+            r"(?:manda|mandala|mandalo|mandale|envia|enviala|envialo|enviale|rutea|ruteala) "
+            r"(?:la pista |el |la )?(?P<from>.+?) (?:a|al|a la) "
             r"(?:la pista |el |la )?(?P<to>.+)"
         ),
         _build_send_add,
@@ -882,7 +899,8 @@ RULES: list[Rule] = [
     Rule(
         "fx_add",
         re.compile(
-            r"(?:carga|cargale|inserta|insertale|pone|pon|ponle|agrega|agregale|sumale|suma) "
+            r"(?:carga|cargale|cargar|inserta|insertale|insertar|pone|pon|ponle|poner|"
+            r"agrega|agregale|agregar|sumale|suma|sumar) "
             r"(?:el |la |un |una )?(?P<fx>.+?) (?:en|a) (?:la pista |el |la )?(?P<track>.+)"
         ),
         _build_fx_add,

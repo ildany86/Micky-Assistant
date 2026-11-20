@@ -88,6 +88,10 @@ class VoiceSection:
     # Cómo contesta: "voz" (todo hablado), "mixto" (sonido al salir bien, voz
     # en errores y preguntas) o "sonidos" (solo sonidos; habla preguntas).
     feedback: str = "mixto"
+    # Interrumpir a Miky hablándole (si Miky se corta solo, subir el nivel
+    # o desactivarlo).
+    barge_in: bool = True
+    barge_in_level: float = 0.12
     max_utterance_s: float = 20.0
     confirm_timeout_s: float = 12.0
     follow_up_seconds: float = 8.0

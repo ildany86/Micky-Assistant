@@ -37,6 +37,10 @@ OFFLINE = "offline"
 # alucina frases sobre el ruido de fondo.
 MIN_SEGMENT_RMS = 0.006
 
+# Barge-in: cuántos bloques de 32 ms seguidos tiene que haber voz fuerte para
+# cortar la respuesta (≈ 260 ms), y así no la corta un golpe de mesa.
+BARGE_IN_BLOCKS = 8
+
 # Transcripción especulativa: si la frase se quedó callada un momento, se
 # empieza a transcribir YA, mientras el VAD todavía espera para cerrar. Si el
 # usuario sigue hablando, se descarta y se usa el audio completo.
@@ -60,6 +64,8 @@ class VoiceSettings:
     chime: bool = True
     follow_up_seconds: float = 8.0
     corrections: tuple[str, ...] = ()
+    barge_in: bool = True
+    barge_in_level: float = 0.12
 
     @classmethod
     def from_config(cls, voice: VoiceSection) -> "VoiceSettings":
@@ -77,6 +83,8 @@ class VoiceSettings:
             chime=voice.chime,
             follow_up_seconds=voice.follow_up_seconds,
             corrections=tuple(getattr(voice, "corrections", ()) or ()),
+            barge_in=bool(getattr(voice, "barge_in", True)),
+            barge_in_level=float(getattr(voice, "barge_in_level", 0.12) or 0.12),
         )
 
 
@@ -120,6 +128,7 @@ class VoicePipeline:
         self._muted = False
         self._awaiting_command = False
         self._processing_lock = threading.Lock()
+        self._barge_frames = 0
         self._confirm_event: threading.Event | None = None
         self._confirm_answer: bool | None = None
         self._confirm_deadline = 0.0
@@ -190,6 +199,31 @@ class VoicePipeline:
         self._spec = None
         if muted and self.segmenter is not None:
             self.segmenter.reset()
+
+    def _check_barge_in(self, level: float) -> bool:
+        """¿El usuario habló mientras Miky hablaba? Devuelve True si lo cortó.
+
+        El nivel tiene que sostenerse varios bloques seguidos: un golpe de mesa
+        o un pico del propio audio no deben cortar la respuesta.
+        """
+        if self.tts is None or not self.tts.is_speaking:
+            self._barge_frames = 0
+            return False
+        if not self.settings.barge_in or level < self.settings.barge_in_level:
+            self._barge_frames = 0
+            return False
+        self._barge_frames += 1
+        if self._barge_frames < BARGE_IN_BLOCKS:
+            return False
+        self._barge_frames = 0
+        try:
+            self.tts.stop()
+        except Exception:  # noqa: BLE001
+            pass
+        # Lo que sigue es una orden dirigida a Miky: no hace falta la palabra clave.
+        self._awaiting_command = True
+        log.info("barge-in: se cortó la respuesta porque el usuario habló")
+        return True
 
     def expect_confirmation(self, speak_text: str = "", timeout: float = 12.0) -> bool:
         """Espera un sí/no por voz. Devuelve False si no hubo respuesta a tiempo.
@@ -290,6 +324,8 @@ class VoicePipeline:
                     self._blocks.reset()
                     continue
                 if self._muted or (self.tts is not None and self.tts.is_speaking):
+                    if self.capture is not None:
+                        self._check_barge_in(self.capture.level)
                     self.segmenter.reset()
                     self._blocks.reset()
                     continue

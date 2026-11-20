@@ -18,6 +18,18 @@ from dataclasses import dataclass
 MIN_TERM_LEN = 3
 MAX_SPAN_TOKENS = 3
 
+# Errores típicos de Whisper con órdenes en imperativo. Se aplican siempre,
+# antes de las correcciones del usuario.
+DEFAULT_RULES: tuple[str, ...] = (
+    "abril el=abrí el",
+    "abril la=abrí la",
+    "abril los=abrí los",
+    "avril el=abrí el",
+    "avril la=abrí la",
+    "abri el=abrí el",
+    "abri la=abrí la",
+)
+
 _TOKEN = re.compile(r"[0-9A-Za-zÁÉÍÓÚÑÜáéíóúñü]+")
 
 
@@ -71,7 +83,7 @@ def correct_text(text: str, terms: list[str] | tuple[str, ...], rules: list[str]
     changes: list[tuple[str, str]] = []
     result = text
 
-    for rule in rules or []:
+    for rule in tuple(DEFAULT_RULES) + tuple(rules or []):
         if "=" not in rule:
             continue
         wrong, _, right = rule.partition("=")

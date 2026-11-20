@@ -1,7 +1,7 @@
 # Aviso de copyright y licencia
 
 **Miky — asistente de voz para REAPER**
-Copyright (C) 2026 Daniel Lugo
+Copyright (C) 2026 Daniel Orlando Lugo
 
 Este programa es software libre: podés redistribuirlo y/o modificarlo bajo los
 términos de la **GNU General Public License, versión 3** (o cualquier versión

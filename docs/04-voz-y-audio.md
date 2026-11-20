@@ -162,6 +162,19 @@ oscuras:
 
 Lo mismo vale para grabaciones largas.
 
+## Interrumpir a Miky (barge-in)
+
+Si le hablás mientras está respondiendo, **se calla y te escucha**. Para eso se
+mide el nivel del micrófono mientras habla: tiene que sostenerse ~260 ms por
+encima de `voice.barge_in_level` (0,12 por defecto) para cortar la respuesta, así
+no la corta un golpe de mesa ni un pico del propio audio.
+
+Después de interrumpirlo, la frase que sigue se toma como una orden **sin
+necesidad de la palabra clave**, porque ya estaba hablándole a él.
+
+Si Miky se corta solo (el audio de los parlantes entra al micrófono), subí
+`barge_in_level` o poné `barge_in = false`.
+
 ## Corrección de la transcripción
 
 Whisper inventa las palabras que no conoce: marcas, nombres de pistas, siglas. Antes
@@ -250,6 +263,30 @@ REAPER tiene una carpeta **Favoritos** en el explorador de plugins. Miky la lee
 
 Los favoritos marcados que ya no están instalados se avisan: «los marcados no están
 instalados: Eamut Drums Compressor».
+
+## Medir la precisión
+
+`tools/voice_accuracy.py` sintetiza 20 frases reales, las transcribe con el
+modelo de verdad y mide dos cosas: el error de palabra (WER) y, sobre todo, el
+**porcentaje de frases que terminan en el comando correcto**.
+
+```powershell
+.venv\Scripts\python.exe tools\voice_accuracy.py            # voz real (edge)
+.venv\Scripts\python.exe tools\voice_accuracy.py --engine sapi  # sin internet
+```
+
+Línea base medida en esta máquina (beta 0.2):
+
+| | Antes | Después de tolerar conjugaciones |
+|---|---|---|
+| Comando correcto | 60 % (12/20) | **90 % (18/20)** |
+| WER | 22,5 % | ~28 %* |
+| Reconocimiento | 1,44 s | **1,2–1,4 s** |
+
+\* El WER sube porque se mide el texto crudo; lo que importa es el comando.
+Whisper normaliza los imperativos («poné» → «pone», «grabá» → «graba») y el
+router ahora acepta esas formas, más las erratas típicas («12b», «paniala»,
+«abril a matriz»).
 
 ## Elegir entre varios plugins
 

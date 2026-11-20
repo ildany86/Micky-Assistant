@@ -27,6 +27,7 @@ a closed catalog of commands against the DAW's API.
 - **Finds plugins by description** (“an SSL-bus-style compressor”) and, when
   several match, offers numbered options.
 - **Asks before breaking anything**: deleting tracks, rendering or overwriting.
+- **Stops talking if you interrupt**: speak over it and it listens right away.
 - **Asks “are you ready?” before recording** and starts silently, so its voice
   never ends up in the take.
 - **Keeps working offline** for basic orders (local router).
@@ -177,5 +178,5 @@ Testing it and reporting what breaks helps just as much
 it; if you distribute a modified version, it must stay free and with the source
 available.
 
-Copyright © 2026 Daniel Lugo. See [NOTICE.md](NOTICE.md) for details and the
+Copyright © 2026 Daniel Orlando Lugo. See [NOTICE.md](NOTICE.md) for details and the
 licenses of third-party components (Whisper, edge-tts, Qt, REAPER).
