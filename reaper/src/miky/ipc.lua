@@ -377,6 +377,40 @@ MIKY.ipc = (function()
     end
   end
 
+  -- Pedidos de una sesion anterior (la app se cerro de golpe): si se ejecutan
+  -- al abrir REAPER, se corre una orden vieja que nadie pidió.
+  function IPC.purge_stale_requests(max_age_s)
+    if not IPC.req_dir then
+      return 0
+    end
+    reaper.EnumerateFiles(IPC.req_dir, -1)
+    local now = os.time()
+    local max_age = max_age_s or 120
+    local removed = 0
+    local index = 0
+    while index < 512 do
+      local name = reaper.EnumerateFiles(IPC.req_dir, index)
+      if not name then
+        break
+      end
+      if name:match('%.req%.json$') then
+        local millis = tonumber(name:match('^m(%d+)'))
+        if millis then
+          local age = now - math.floor(millis / 1000)
+          if age > max_age then
+            os.remove(IPC.req_dir .. '/' .. name)
+            removed = removed + 1
+          end
+        end
+      end
+      index = index + 1
+    end
+    if removed > 0 then
+      log_line('descarté ' .. removed .. ' pedido(s) viejo(s) de una sesión anterior')
+    end
+    return removed
+  end
+
   function IPC.main()
     if not IPC.setup() then
       return
@@ -401,6 +435,7 @@ MIKY.ipc = (function()
     log_line('puente v' .. MIKY.VERSION .. ' iniciado · instancia ' .. IPC.instance .. ' · REAPER ' .. reaper.GetAppVersion())
 
     pcall(IPC.write_status)
+    pcall(IPC.purge_stale_requests)
 
     local function tick()
       local ok, err = pcall(IPC.pump)
